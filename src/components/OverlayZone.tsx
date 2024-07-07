@@ -40,7 +40,7 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
         onDragEnter={_onDragEnter}
         onDragLeave={onDragLeave}
       >
-        <p className="text-red-200">INDEX : {index}</p>
+        Overlay
       </div>
     </div>
   );
