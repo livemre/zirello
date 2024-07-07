@@ -1,0 +1,49 @@
+import React, { DragEvent, FC, useState } from "react";
+
+type Props = {
+  height: number;
+  onDrop: (e: DragEvent, index: number) => void;
+  onDragEnter: (e: DragEvent) => void;
+  index: number;
+};
+
+const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
+  const [show, setShow] = useState(false);
+
+  const _onDragEnter = (e: DragEvent) => {
+    setShow(true);
+    onDragEnter(e);
+  };
+
+  const onDragLeave = () => {
+    setShow(false);
+  };
+
+  const onDragOver = (e: DragEvent) => {
+    e.preventDefault(); // onDrop'un çalışması için gereklidir
+  };
+
+  const _onDrop = (e: DragEvent) => {
+    e.preventDefault();
+    setShow(false); // İsteğe bağlı: öğe bırakıldığında göstergeyi gizleyin
+
+    onDrop(e, index);
+  };
+
+  return (
+    <div>
+      <div
+        onDrop={_onDrop}
+        onDragOver={onDragOver}
+        className={show ? "showZone" : "hideZone"}
+        style={{ height: show ? `${height}px` : undefined }}
+        onDragEnter={_onDragEnter}
+        onDragLeave={onDragLeave}
+      >
+        <p className="text-red-200">INDEX : {index}</p>
+      </div>
+    </div>
+  );
+};
+
+export default OverlayZone;
