@@ -56,6 +56,19 @@
 
 }
 
+.hide-list-overlay {
+  opacity: 0;
+  
+}
+
+.show-list-overlay {
+  opacity: 1;
+  border: 1px dashed #a4a4a4;
+  background-color: #000000;
+  margin: 0 10px;
+}
+
+
 .draggingItem {
   opacity: 0.5;
 }

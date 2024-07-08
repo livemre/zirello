@@ -40,6 +40,8 @@ const List: FC<Props> = ({ title, id }) => {
     draggedItemRef.current = e.target as HTMLDivElement;
     setActiveItem(item);
 
+    e.dataTransfer.setData("item", "item");
+
     const draggedItemheight = draggedItemRef.current?.offsetHeight;
     if (draggedItemheight) {
       setDraggedItemHeight(draggedItemheight);

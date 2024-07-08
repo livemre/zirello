@@ -6,7 +6,7 @@ export type Item = {
   listID: string;
 };
 
-type List = {
+export type List = {
   id: string;
   title: string;
   items: Item[];
@@ -24,6 +24,9 @@ type Props = {
   activeItem: Item | null;
   setActiveItem: React.Dispatch<React.SetStateAction<Item | null>>;
   moveItem: (index: number, item: Item) => void;
+  activeList: List | undefined;
+  setActiveList: React.Dispatch<React.SetStateAction<List | undefined>>;
+  moveList: (index: number) => void;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -34,6 +37,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [draggedItemHeight, setDraggedItemHeight] = useState<number>(0);
   const [targetColumnID, setTargetColumnID] = useState<string>("");
   const [activeItem, setActiveItem] = useState<Item | null>(null);
+
+  const [activeList, setActiveList] = useState<List | undefined>(undefined);
 
   const addItem = (title: string, listID: string) => {
     const id = (db.length + 1).toString();
@@ -55,6 +60,22 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     setDB(updatedDB);
   };
 
+  const moveList = (index: number) => {
+    console.log("Move Item Context");
+
+    if (activeList) {
+      setLists((prevLists) => {
+        const updateLists = prevLists.filter(
+          (listItem) => listItem.id !== activeList.id
+        );
+        updateLists.splice(index, 0, activeList);
+
+        console.log(updateLists);
+        return updateLists;
+      });
+    }
+  };
+
   return (
     <MainContext.Provider
       value={{
@@ -69,6 +90,9 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         activeItem,
         setActiveItem,
         moveItem,
+        activeList,
+        setActiveList,
+        moveList,
       }}
     >
       {children}
