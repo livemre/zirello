@@ -34,13 +34,20 @@ const List: FC<Props> = ({ title, id }) => {
     setActiveItem,
     targetColumnID,
     moveItem,
+    setActiveDraggedType,
+    activeDraggedType,
   } = context;
 
   const onDragStart = (e: DragEvent, item: Item) => {
+    e.stopPropagation();
     draggedItemRef.current = e.target as HTMLDivElement;
     setActiveItem(item);
+    console.log("Item drag start");
+    console.log("ACTIVE BOARD" + " list on drag start");
+    setActiveDraggedType("item");
 
-    e.dataTransfer.setData("item", "item");
+    e.dataTransfer.setData("type", "item");
+    console.log(e.dataTransfer.getData("type"));
 
     const draggedItemheight = draggedItemRef.current?.offsetHeight;
     if (draggedItemheight) {
@@ -75,7 +82,7 @@ const List: FC<Props> = ({ title, id }) => {
   };
 
   return (
-    <div className="w-80 min-w-80 h-full bg-gray-950 p-2">
+    <div className="w-80 min-w-80 h-full bg-gray-950 p-2 rounded-lg">
       <p className="text-gray-200 text-2xl">{title}</p>
 
       <OverlayZone
@@ -93,11 +100,9 @@ const List: FC<Props> = ({ title, id }) => {
                 onDragStart={(e) => onDragStart(e, item)}
                 onDragOver={(e) => onDragOver(e)}
                 draggable
-                className={`text-white  m-1 bg-gray-800 card`}
+                className={`text-white  m-1 bg-gray-800 card rounded-lg`}
               >
                 <p>{item.title}</p>
-                <p>{item.id}</p>
-                <p>{index}</p>
               </div>
               <OverlayZone
                 height={draggedItemHeight}

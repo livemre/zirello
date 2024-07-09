@@ -16,7 +16,7 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
     throw new Error("No context");
   }
 
-  const { moveList } = context;
+  const { moveList, activeDraggedType } = context;
 
   const _onDragOver = (e: DragEvent) => {
     e.preventDefault();
@@ -26,6 +26,14 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
 
   const _onDragEnter = (e: DragEvent) => {
     e.preventDefault();
+
+    const draggedItemType = e.dataTransfer.getData("type");
+
+    console.log(draggedItemType);
+
+    if (activeDraggedType !== "list") {
+      return; // Prevent the function from running if the type doesn't match
+    }
 
     onDragEnter(e);
     setShow(true);
@@ -40,6 +48,10 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
   const onDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     console.log("Drop");
+    const draggedItemType = e.dataTransfer.getData("type");
+    if (draggedItemType !== "list") {
+      return; // Prevent the function from running if the type doesn't match
+    }
 
     setShow(false);
     moveList(index);
@@ -53,9 +65,7 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
       onDrop={(e: React.DragEvent) => onDrop(e, index)}
       className={`${show ? "show-list-overlay" : "hide-list-overlay"}`}
       style={{ minWidth: show ? "300px" : undefined }}
-    >
-      ListOverlayZone
-    </div>
+    ></div>
   );
 };
 

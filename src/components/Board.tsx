@@ -10,13 +10,29 @@ const Board = () => {
     throw new Error("No Context");
   }
 
-  const { lists, activeList, setActiveList } = context;
+  const {
+    lists,
+    activeList,
+    setActiveList,
+    activeItem,
+    setActiveDraggedType,
+    activeDraggedType,
+  } = context;
 
-  const onDragStart = (e: React.DragEvent, list: ListType, index: number) => {
+  const onDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    list: ListType,
+    index: number
+  ) => {
     setActiveList(list);
-    e.dataTransfer.setData("list", "list");
+    e.dataTransfer.setData("type", "list");
     console.log("Active List " + activeList?.id);
     console.log("Active List Index " + index);
+    console.log("ACTIVE BOARD" + activeList?.title);
+    console.log("ACTIVE BOARD" + activeItem?.title);
+    console.log("ACTIVE BOARD" + " Board onStart");
+    console.log("ACTIVE BOARD" + activeItem?.title);
+    setActiveDraggedType("list");
   };
 
   const onDragOver = (e: DragEvent) => {
@@ -29,7 +45,7 @@ const Board = () => {
   };
 
   return (
-    <div className="flex flex-row justify-start  bg-red-100">
+    <div className="flex flex-row justify-start">
       <ListOverlayZone
         onDragEnter={onDragEnter}
         onDragOver={onDragOver}
@@ -38,7 +54,7 @@ const Board = () => {
       <div className="flex">
         {lists.map((item, index) => {
           return (
-            <div className="flex" key={item.id}>
+            <div className="flex h-fit list" key={item.id}>
               <div draggable onDragStart={(e) => onDragStart(e, item, index)}>
                 <List title={item.title} id={item.id} />
               </div>

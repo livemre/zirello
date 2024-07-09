@@ -27,6 +27,8 @@ type Props = {
   activeList: List | undefined;
   setActiveList: React.Dispatch<React.SetStateAction<List | undefined>>;
   moveList: (index: number) => void;
+  activeDraggedType: string;
+  setActiveDraggedType: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -39,6 +41,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [activeItem, setActiveItem] = useState<Item | null>(null);
 
   const [activeList, setActiveList] = useState<List | undefined>(undefined);
+
+  const [activeDraggedType, setActiveDraggedType] = useState<string>("");
 
   const addItem = (title: string, listID: string) => {
     const id = (db.length + 1).toString();
@@ -93,6 +97,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         activeList,
         setActiveList,
         moveList,
+        activeDraggedType,
+        setActiveDraggedType,
       }}
     >
       {children}

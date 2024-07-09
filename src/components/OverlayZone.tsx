@@ -1,4 +1,5 @@
-import React, { DragEvent, FC, useState } from "react";
+import React, { DragEvent, FC, useContext, useState } from "react";
+import { MainContext } from "../context/Context";
 
 type Props = {
   height: number;
@@ -10,7 +11,18 @@ type Props = {
 const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
   const [show, setShow] = useState(false);
 
+  const context = useContext(MainContext);
+
+  if (!context) {
+    throw new Error("No Context");
+  }
+
+  const { activeDraggedType } = context;
+
   const _onDragEnter = (e: DragEvent) => {
+    if (activeDraggedType !== "item") {
+      return; // Prevent the function from running if the type doesn't match
+    }
     setShow(true);
     onDragEnter(e);
   };
@@ -25,6 +37,11 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
 
   const _onDrop = (e: DragEvent) => {
     e.preventDefault();
+    console.log("EMRE " + e.dataTransfer.getData("type"));
+
+    if (e.dataTransfer.getData("type") !== "item") {
+      setShow(false);
+    }
     setShow(false); // İsteğe bağlı: öğe bırakıldığında göstergeyi gizleyin
 
     onDrop(e, index);
