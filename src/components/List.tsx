@@ -1,13 +1,8 @@
-import React, {
-  ChangeEvent,
-  DragEvent,
-  FC,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+// List.tsx
+import React, { ChangeEvent, DragEvent, FC, useContext, useState } from "react";
 import { Item, MainContext } from "../context/Context";
 import OverlayZone from "./OverlayZone";
+import ItemCard from "./ItemCard"; // ItemCard'ı import edin
 
 type Props = {
   title: string;
@@ -15,7 +10,6 @@ type Props = {
 };
 
 const List: FC<Props> = ({ title, id }) => {
-  const draggedItemRef = useRef<HTMLDivElement | null>(null);
   const [showInput, setShowInput] = useState(false);
   const [_title, _setTitle] = useState<string>("");
 
@@ -27,50 +21,24 @@ const List: FC<Props> = ({ title, id }) => {
   const {
     addItem,
     db,
-    setDraggedItemHeight,
-    draggedItemHeight,
     setTargetColumnID,
     activeItem,
-    setActiveItem,
     targetColumnID,
     moveItem,
-    setActiveDraggedType,
-    activeDraggedType,
+    draggedItemHeight,
   } = context;
-
-  const onDragStart = (e: DragEvent, item: Item) => {
-    e.stopPropagation();
-    draggedItemRef.current = e.target as HTMLDivElement;
-    setActiveItem(item);
-    console.log("Item drag start");
-    console.log("ACTIVE BOARD" + " list on drag start");
-    setActiveDraggedType("item");
-
-    e.dataTransfer.setData("type", "item");
-    console.log(e.dataTransfer.getData("type"));
-
-    const draggedItemheight = draggedItemRef.current?.offsetHeight;
-    if (draggedItemheight) {
-      setDraggedItemHeight(draggedItemheight);
-    }
-  };
 
   const onDragEnter = (e: DragEvent) => {
     e.preventDefault();
     setTargetColumnID(id);
-    console.log(targetColumnID);
   };
 
-  const onDragOver = (e: DragEvent) => {};
+  const onDragOver = (e: DragEvent) => {
+    e.preventDefault();
+  };
 
   const onDrop = (e: DragEvent, index: number) => {
     e.preventDefault();
-    // MoveItem fonksiyonu yazicam ve su 3 veriyi gondermem lazim
-    // 1 - Suruklenen Oge
-    // ActiveItem
-    // 2 - Suruklenecek Liste
-    // TargetColumnID
-    // 3 - Suruklenecek konum
 
     if (activeItem) {
       moveItem(index, activeItem);
@@ -82,7 +50,7 @@ const List: FC<Props> = ({ title, id }) => {
   };
 
   return (
-    <div className="w-80 min-w-80 h-full bg-gray-950 p-2 rounded-lg">
+    <div className="w-80 min-w-80 h-full bg-gray-950 p-2 rounded-lg list">
       <p className="text-gray-200 text-2xl">{title}</p>
 
       <OverlayZone
@@ -95,19 +63,18 @@ const List: FC<Props> = ({ title, id }) => {
         if (item.listID === id) {
           return (
             <div key={item.id}>
-              <div
+              <ItemCard
+                title={title}
+                item={item}
+                index={index}
                 onDragEnter={onDragEnter}
-                onDragStart={(e) => onDragStart(e, item)}
-                onDragOver={(e) => onDragOver(e)}
-                draggable
-                className={`text-white  m-1 bg-gray-800 card rounded-lg`}
-              >
-                <p>{item.title}</p>
-              </div>
+                onDragOver={onDragOver}
+                onDrop={(e) => onDrop(e, index + 1)}
+              />
               <OverlayZone
                 height={draggedItemHeight}
                 onDrop={(e) => onDrop(e, index + 1)}
-                onDragEnter={(e) => onDragEnter(e)}
+                onDragEnter={onDragEnter}
                 index={index}
               />
             </div>
@@ -116,13 +83,13 @@ const List: FC<Props> = ({ title, id }) => {
         return null;
       })}
       {showInput ? (
-        <div className=" flex-col">
+        <div className="flex-col">
           <textarea
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               _setTitle(e.target.value)
             }
-            className=" w-full p-2 rounded-lg mb-2 bg-gray-700 text-white"
-            placeholder="Bu kart icin bir baslik girin..."
+            className="w-full p-2 rounded-lg mb-2 bg-gray-700 text-white"
+            placeholder="Bu kart için bir başlık girin..."
           />
           <div className="flex justify-start mb-2">
             <button

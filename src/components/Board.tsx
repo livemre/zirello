@@ -54,7 +54,7 @@ const Board = () => {
       <div className="flex">
         {lists.map((item, index) => {
           return (
-            <div className="flex h-fit list" key={item.id}>
+            <div className="flex list" key={item.id}>
               <div draggable onDragStart={(e) => onDragStart(e, item, index)}>
                 <List title={item.title} id={item.id} />
               </div>

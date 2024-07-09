@@ -3,9 +3,10 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: #888;
+  background-color: #0f8bc4;
   max-width: 1920px;
   overflow-x: auto;
+  height: 100vh;
 }
 
 .logo {
@@ -99,8 +100,36 @@
 
 .list {
 padding: 10px;
+overflow-y: auto;
+max-height: 90vh;
+height: 100%;
 }
 
 .list:active {
   opacity: 0.8;
 }
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background-color: rgba(255, 255, 255, 0.9); /* İçeriğin arka plan rengini değiştirdim */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge ekledim */
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 10px; /* Köşeleri yuvarlattım */
+}
+
+.modal-close-icon {
+  top: 10px;
+  right: 10px;
+  position: absolute;
+  cursor: pointer;
+}
+
