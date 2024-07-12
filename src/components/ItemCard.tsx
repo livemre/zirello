@@ -1,6 +1,6 @@
 // ItemCard.tsx
-import React, { DragEvent, FC, useContext, useRef, useState } from "react";
-import { Item, List, MainContext } from "../context/Context";
+import { DragEvent, FC, useContext, useRef, useState } from "react";
+import { Item, MainContext } from "../context/Context";
 import { IoCloseSharp } from "react-icons/io5";
 
 type Props = {
@@ -17,7 +17,6 @@ const ItemCard: FC<Props> = ({
   index,
   onDragEnter,
   onDragOver,
-  onDrop,
   title,
 }) => {
   const draggedItemRef = useRef<HTMLDivElement | null>(null);
@@ -28,13 +27,19 @@ const ItemCard: FC<Props> = ({
     throw new Error("No context");
   }
 
-  const { setDraggedItemHeight, setActiveItem, setActiveDraggedType } = context;
+  const {
+    setDraggedItemHeight,
+    setActiveItem,
+    setActiveDraggedType,
+    setActiveItemIndex,
+  } = context;
 
   const onDragStart = (e: DragEvent, item: Item) => {
     e.stopPropagation();
     draggedItemRef.current = e.target as HTMLDivElement;
     setActiveItem(item);
     setActiveDraggedType("item");
+    setActiveItemIndex(index);
 
     e.dataTransfer.setData("type", "item");
 
@@ -69,6 +74,7 @@ const ItemCard: FC<Props> = ({
         className="text-white m-1 bg-gray-800 card rounded-lg"
       >
         <p>{item.title}</p>
+        <p className="text-white">{index}</p>
       </div>
     </>
   );

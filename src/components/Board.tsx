@@ -1,4 +1,4 @@
-import React, { DragEvent, useContext, useState } from "react";
+import React, { DragEvent, useContext } from "react";
 import CreateList from "./CreateList";
 import { MainContext, List as ListType } from "../context/Context";
 import List from "./List";
@@ -12,11 +12,10 @@ const Board = () => {
 
   const {
     lists,
-    activeList,
     setActiveList,
-    activeItem,
     setActiveDraggedType,
-    activeDraggedType,
+    setActiveListIndex,
+    user,
   } = context;
 
   const onDragStart = (
@@ -26,13 +25,8 @@ const Board = () => {
   ) => {
     setActiveList(list);
     e.dataTransfer.setData("type", "list");
-    console.log("Active List " + activeList?.id);
-    console.log("Active List Index " + index);
-    console.log("ACTIVE BOARD" + activeList?.title);
-    console.log("ACTIVE BOARD" + activeItem?.title);
-    console.log("ACTIVE BOARD" + " Board onStart");
-    console.log("ACTIVE BOARD" + activeItem?.title);
     setActiveDraggedType("list");
+    setActiveListIndex(index);
   };
 
   const onDragOver = (e: DragEvent) => {
@@ -46,6 +40,10 @@ const Board = () => {
 
   return (
     <div className="flex flex-row justify-start">
+      <div className="flex-col">
+        <div>Hosgeldin {user && user.displayName}</div>
+        <img src={`${user ? user.photoURL : ""}`} width={200} height={200} />
+      </div>
       <ListOverlayZone
         onDragEnter={onDragEnter}
         onDragOver={onDragOver}
@@ -56,7 +54,7 @@ const Board = () => {
           return (
             <div className="flex list" key={item.id}>
               <div draggable onDragStart={(e) => onDragStart(e, item, index)}>
-                <List title={item.title} id={item.id} />
+                <List title={item.title} id={item.id} index={index} />
               </div>
               <ListOverlayZone
                 onDragEnter={onDragEnter}

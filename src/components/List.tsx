@@ -7,9 +7,10 @@ import ItemCard from "./ItemCard"; // ItemCard'ı import edin
 type Props = {
   title: string;
   id: string;
+  index: number;
 };
 
-const List: FC<Props> = ({ title, id }) => {
+const List: FC<Props> = ({ title, id, index }) => {
   const [showInput, setShowInput] = useState(false);
   const [_title, _setTitle] = useState<string>("");
 
@@ -52,6 +53,8 @@ const List: FC<Props> = ({ title, id }) => {
   return (
     <div className="w-80 min-w-80 h-full bg-gray-950 p-2 rounded-lg list">
       <p className="text-gray-200 text-2xl">{title}</p>
+      <p className="text-gray-200 text-2xl">{id}</p>
+      <p className="text-gray-200 text-2xl">{index}</p>
 
       <OverlayZone
         height={draggedItemHeight}
@@ -69,7 +72,7 @@ const List: FC<Props> = ({ title, id }) => {
                 index={index}
                 onDragEnter={onDragEnter}
                 onDragOver={onDragOver}
-                onDrop={(e) => onDrop(e, index + 1)}
+                onDrop={(e) => onDrop(e, index)}
               />
               <OverlayZone
                 height={draggedItemHeight}

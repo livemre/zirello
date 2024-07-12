@@ -1,5 +1,5 @@
 import React, { DragEvent, FC, useContext, useState } from "react";
-import { MainContext, List as ListType } from "../context/Context";
+import { MainContext } from "../context/Context";
 
 type Props = {
   onDragOver: (e: DragEvent) => void;
@@ -16,7 +16,7 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
     throw new Error("No context");
   }
 
-  const { moveList, activeDraggedType } = context;
+  const { moveList, activeDraggedType, activeListIndex } = context;
 
   const _onDragOver = (e: DragEvent) => {
     e.preventDefault();
@@ -32,7 +32,15 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
     console.log(draggedItemType);
 
     if (activeDraggedType !== "list") {
-      return; // Prevent the function from running if the type doesn't match
+      return;
+    }
+
+    if (index === activeListIndex) {
+      return;
+    }
+
+    if (index === activeListIndex + 1) {
+      return;
     }
 
     onDragEnter(e);
@@ -50,7 +58,7 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
     console.log("Drop");
     const draggedItemType = e.dataTransfer.getData("type");
     if (draggedItemType !== "list") {
-      return; // Prevent the function from running if the type doesn't match
+      return;
     }
 
     setShow(false);
@@ -65,7 +73,9 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
       onDrop={(e: React.DragEvent) => onDrop(e, index)}
       className={`${show ? "show-list-overlay" : "hide-list-overlay"}`}
       style={{ minWidth: show ? "300px" : undefined }}
-    ></div>
+    >
+      <p className="text-white">{index}</p>
+    </div>
   );
 };
 

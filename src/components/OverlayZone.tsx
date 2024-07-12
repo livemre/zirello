@@ -1,4 +1,4 @@
-import React, { DragEvent, FC, useContext, useState } from "react";
+import { DragEvent, FC, useContext, useState } from "react";
 import { MainContext } from "../context/Context";
 
 type Props = {
@@ -21,8 +21,9 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
 
   const _onDragEnter = (e: DragEvent) => {
     if (activeDraggedType !== "item") {
-      return; // Prevent the function from running if the type doesn't match
+      return;
     }
+
     setShow(true);
     onDragEnter(e);
   };
@@ -32,7 +33,7 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
   };
 
   const onDragOver = (e: DragEvent) => {
-    e.preventDefault(); // onDrop'un çalışması için gereklidir
+    e.preventDefault();
   };
 
   const _onDrop = (e: DragEvent) => {
@@ -57,7 +58,7 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
         onDragEnter={_onDragEnter}
         onDragLeave={onDragLeave}
       >
-        Overlay
+        <p className="h-10">EMRE</p>
       </div>
     </div>
   );
