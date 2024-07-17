@@ -1,9 +1,10 @@
 import { Router, RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
-import Board from "./components/Board";
+import Board from "./pages/Board";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Boards from "./pages/Boards";
+import Input from "./Input";
 
 function App() {
   const router = createBrowserRouter([
@@ -20,7 +21,7 @@ function App() {
       element: <Boards />,
     },
     {
-      path: "/board",
+      path: "/board/:id",
       element: <Board />,
     },
   ]);

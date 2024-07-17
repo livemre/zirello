@@ -5,9 +5,15 @@ type Props = {
   onDragOver: (e: DragEvent) => void;
   onDragEnter: (e: DragEvent) => void;
   index: number;
+  boardID: string;
 };
 
-const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
+const ListOverlayZone: FC<Props> = ({
+  onDragOver,
+  onDragEnter,
+  index,
+  boardID,
+}) => {
   const [show, setShow] = useState<boolean>(false);
 
   const context = useContext(MainContext);
@@ -62,7 +68,7 @@ const ListOverlayZone: FC<Props> = ({ onDragOver, onDragEnter, index }) => {
     }
 
     setShow(false);
-    moveList(index);
+    moveList(index, boardID);
   };
 
   return (

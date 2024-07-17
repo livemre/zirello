@@ -1,5 +1,6 @@
 import React, {
   ChangeEvent,
+  FC,
   ReactNode,
   useContext,
   useEffect,
@@ -10,9 +11,11 @@ import { CiSquarePlus } from "react-icons/ci";
 import { IoCloseSharp } from "react-icons/io5";
 import { MainContext } from "../context/Context";
 
-type Props = {};
+type Props = {
+  boardID: string;
+};
 
-const CreateList = () => {
+const CreateList: FC<Props> = ({ boardID }) => {
   const [showInput, setShowInput] = useState(false);
   const inputRef = useRef<HTMLDivElement | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -23,7 +26,7 @@ const CreateList = () => {
     throw new Error("No Context");
   }
 
-  const { addList } = context;
+  const { addList, lists } = context;
 
   useEffect(() => {
     const onOutisdeClick = (e: MouseEvent) => {
@@ -46,7 +49,8 @@ const CreateList = () => {
   };
 
   const _addList = () => {
-    addList(title);
+    const listSize = lists.length;
+    addList(title, boardID, listSize);
   };
 
   if (showInput) {

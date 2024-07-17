@@ -1,38 +1,44 @@
 import React, { FC, ReactNode, createContext, useState } from "react";
 import myFirebaseApp from "./firebaseConfig";
 import {
+  QueryDocumentSnapshot,
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   query,
   setDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
+import { list } from "firebase/storage";
 
 export type Item = {
   id: string;
   title: string;
   listID: string;
+  itemIndex: number;
 };
 
 export type List = {
   id: string;
   title: string;
-  items: Item[];
+  indexInList: number;
 };
 
 export type Board = {
-  id: string;
   name: string;
+  userID: string;
+  id: string;
 };
 
 type Props = {
-  addItem: (title: string, listID: string) => void;
-  addList: (title: string) => void;
+  addItem: (title: string, listID: string, index: number) => void;
+  //addList: (title: string) => void;
   db: Item[];
   lists: List[];
   draggedItemHeight: number;
@@ -44,7 +50,7 @@ type Props = {
   moveItem: (index: number, item: Item) => void;
   activeList: List | undefined;
   setActiveList: React.Dispatch<React.SetStateAction<List | undefined>>;
-  moveList: (index: number) => void;
+  moveList: (index: number, boardID: string) => void;
   activeDraggedType: string;
   setActiveDraggedType: React.Dispatch<React.SetStateAction<string>>;
   activeListIndex: number;
@@ -53,9 +59,13 @@ type Props = {
   setActiveItemIndex: React.Dispatch<React.SetStateAction<number>>;
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  addUser: (email: string, displayName: string) => void;
-  createBoard: (name: string, userId: string) => void;
-  getUserId: (email: string) => any;
+  addUser: (userID: string, email: string, displayName: string) => void;
+  getBoards: (userID: string) => void;
+  addBoard: (userID: string, name: string) => void;
+  boards: Board[];
+  addList: (title: string, boardID: string, indexInList: number) => void;
+  getListsOfBoard: (boardID: string) => Promise<boolean>;
+  getItem: (listIDs: any) => void;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -66,30 +76,71 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [draggedItemHeight, setDraggedItemHeight] = useState<number>(0);
   const [targetColumnID, setTargetColumnID] = useState<string>("");
   const [activeItem, setActiveItem] = useState<Item | null>(null);
-
   const [activeList, setActiveList] = useState<List | undefined>(undefined);
-
   const [activeDraggedType, setActiveDraggedType] = useState<string>("");
-
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [activeItemIndex, setActiveItemIndex] = useState<number>(0);
-
   const [user, setUser] = useState<User | null>(null);
-
+  const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
 
-  const getUserId = async (email: string) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", email));
+  const getListsOfBoard = async (boardID: string): Promise<boolean> => {
+    const listRef = collection(database, "lists");
+
+    const q = query(listRef, where("boardID", "==", boardID));
     const querySnapshot = await getDocs(q);
+    let lists: List[] = [];
+    querySnapshot.forEach((item) => {
+      const listData = item.data() as List;
+      lists.push({ ...listData, id: item.id });
+    });
 
-    const userId =
-      querySnapshot.size > 0 ? querySnapshot.docs[0].id : undefined;
-
-    return userId;
+    setLists(lists);
+    return true;
   };
 
-  const addUser = async (email: string, displayName: string) => {
+  const addBoard = async (userID: string, name: string) => {
+    console.log("Add board " + userID);
+    console.log(name);
+
+    const boardRef = collection(database, "boards");
+    const board = await addDoc(boardRef, {
+      name,
+      userID,
+    });
+
+    const boardDocID = board.id;
+
+    await setDoc(
+      doc(database, "boards", boardDocID),
+      { id: boardDocID },
+      { merge: true }
+    );
+  };
+
+  const getBoards = async (userID: string) => {
+    try {
+      const boardRef = collection(database, "boards");
+      const q = query(boardRef, where("userID", "==", userID));
+      const querySnapshot = await getDocs(q);
+      let boardsData: Board[] = []; // Yeni array
+
+      querySnapshot.forEach((item: QueryDocumentSnapshot) => {
+        console.log(item.data());
+        const boardData = item.data() as Board;
+        boardsData.push({ ...boardData });
+      });
+      setBoards(boardsData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const addUser = async (
+    userID: string,
+    email: string,
+    displayName: string
+  ) => {
     // Check if user exist
 
     const userRef = collection(database, "users");
@@ -107,61 +158,139 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
 
-    const newUser = await addDoc(userRef, {
+    await addDoc(userRef, {
       email: email,
       displayName: displayName,
+      id: userID,
     });
-
-    const id = newUser.id;
-
-    await setDoc(doc(database, "users", id), { id }, { merge: true });
   };
 
-  const createBoard = async (name: string, userId: string) => {
+  const addItem = async (title: string, listID: string, index: number) => {
+    const itemRef = collection(database, "items");
+
+    const addedItem = await addDoc(itemRef, {
+      title: title,
+      listID: listID,
+      itemIndex: index,
+    });
+
+    const id = addedItem.id;
+
+    await setDoc(doc(database, "items", id), { id: id }, { merge: true });
+
+    // const id = (db.length + 1).toString();
+    // setDB([...db, { id, title, listID }]);
+  };
+
+  const getItem = async (listIDs: string[]) => {
+    console.log(listIDs);
+
+    const itemRef = collection(database, "items");
+    const recivedList: any = [];
+
+    for (const item of listIDs) {
+      console.log(item);
+
+      const q = query(itemRef, where("listID", "==", item));
+      const docs = await getDocs(q);
+
+      docs.docs.forEach((doc) => {
+        recivedList.push(doc.data());
+      });
+    }
+
+    setDB(recivedList);
+  };
+
+  const addList = async (
+    title: string,
+    boardID: string,
+    indexInList: number
+  ) => {
     const id = uuidv4();
+    const listRef = collection(database, "lists");
 
-    if (userId === null) return console.log("No User Id");
-    const userRef = doc(database, "users", userId);
-    const boardsRef = collection(userRef, "boards");
-
-    const newBoard = await addDoc(boardsRef, {
-      id: id,
-      name: name,
-    });
+    await addDoc(listRef, { id: id, title, boardID, indexInList });
   };
 
-  const addItem = (title: string, listID: string) => {
-    const id = (db.length + 1).toString();
-    setDB([...db, { id, title, listID }]);
-  };
-
-  const addList = (title: string) => {
-    const id = (lists.length + 1).toString();
-    setLists([...lists, { id, title, items: [] }]);
-  };
-
-  const moveItem = (index: number, item: Item) => {
+  const moveItem = async (index: number, item: Item) => {
     if (index === null) return;
 
     const updatedDB = db.filter((dbItem) => dbItem.id !== item.id);
+    console.log(targetColumnID);
 
     updatedDB.splice(index, 0, { ...item, listID: targetColumnID });
 
     setDB(updatedDB);
+    console.log(updatedDB);
+
+    // itemIndex değerlerini güncelle
+    updatedDB.forEach((item, idx) => {
+      item.itemIndex = idx;
+    });
+
+    // Firebase'de toplu güncelleme işlemi
+    const batch = writeBatch(database);
+
+    updatedDB.forEach((item) => {
+      const itemRef = doc(database, "items", item.id); // Burada doc fonksiyonunun doğru kullanıldığından emin olun
+      batch.update(itemRef, { listID: item.listID, itemIndex: item.itemIndex });
+    });
+
+    try {
+      await batch.commit();
+      console.log("Firebase güncellemesi başarılı");
+      setDB(updatedDB);
+    } catch (error) {
+      console.error("Firebase güncellemesi sırasında hata: ", error);
+    }
   };
 
-  const moveList = (index: number) => {
+  const moveList = async (index: number, boardID: string) => {
     console.log("Move Item Context");
 
+    // Firebase'den listeleri al
+    const boardsRef = collection(database, "lists");
+    const q = query(boardsRef, where("boardID", "==", boardID));
+    const listsSnapshot = await getDocs(q);
+    const listsData = listsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Verileri güncelle
     if (activeList) {
       setLists((prevLists) => {
-        const updateLists = prevLists.filter(
+        const updatedLists = prevLists.filter(
           (listItem) => listItem.id !== activeList.id
         );
-        updateLists.splice(index, 0, activeList);
+        updatedLists.splice(index, 0, activeList);
 
-        console.log(updateLists);
-        return updateLists;
+        // indexInList değerlerini güncelle
+        updatedLists.forEach((list, idx) => {
+          list.indexInList = idx;
+        });
+
+        console.log(updatedLists);
+
+        // Firebase'de toplu güncelleme işlemi
+        const batch = writeBatch(database);
+
+        updatedLists.forEach((list) => {
+          const listRef = doc(database, "lists", list.id);
+          batch.update(listRef, { indexInList: list.indexInList });
+        });
+
+        batch
+          .commit()
+          .then(() => {
+            console.log("Firebase güncellemesi başarılı");
+          })
+          .catch((error) => {
+            console.error("Firebase güncellemesi sırasında hata: ", error);
+          });
+
+        return updatedLists;
       });
     }
   };
@@ -192,8 +321,11 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         user,
         setUser,
         addUser,
-        createBoard,
-        getUserId,
+        getBoards,
+        addBoard,
+        boards,
+        getListsOfBoard,
+        getItem,
       }}
     >
       {children}

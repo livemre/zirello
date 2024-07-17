@@ -37,7 +37,7 @@ const Login = (props: Props) => {
           if (user.email && user.displayName) {
             console.log("email ve displayname var");
 
-            addUser(user.email, user.displayName);
+            addUser(user.uid, user.email, user.displayName);
           }
         }
       })

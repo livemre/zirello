@@ -1,5 +1,12 @@
 // List.tsx
-import React, { ChangeEvent, DragEvent, FC, useContext, useState } from "react";
+import React, {
+  ChangeEvent,
+  DragEvent,
+  FC,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Item, MainContext } from "../context/Context";
 import OverlayZone from "./OverlayZone";
 import ItemCard from "./ItemCard"; // ItemCard'ı import edin
@@ -8,9 +15,10 @@ type Props = {
   title: string;
   id: string;
   index: number;
+  indexInList: number;
 };
 
-const List: FC<Props> = ({ title, id, index }) => {
+const List: FC<Props> = ({ title, id, index, indexInList }) => {
   const [showInput, setShowInput] = useState(false);
   const [_title, _setTitle] = useState<string>("");
 
@@ -28,6 +36,10 @@ const List: FC<Props> = ({ title, id, index }) => {
     moveItem,
     draggedItemHeight,
   } = context;
+
+  useEffect(() => {
+    console.log(db);
+  }, [db]);
 
   const onDragEnter = (e: DragEvent) => {
     e.preventDefault();
@@ -47,7 +59,8 @@ const List: FC<Props> = ({ title, id, index }) => {
   };
 
   const _addItem = () => {
-    addItem(_title, id);
+    const getIndex = db.length;
+    addItem(_title, id, getIndex);
   };
 
   return (
@@ -55,6 +68,7 @@ const List: FC<Props> = ({ title, id, index }) => {
       <p className="text-gray-200 text-2xl">{title}</p>
       <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>
+      <p className="text-gray-200 text-2xl">{indexInList}</p>
 
       <OverlayZone
         height={draggedItemHeight}
@@ -62,29 +76,31 @@ const List: FC<Props> = ({ title, id, index }) => {
         onDragEnter={onDragEnter}
         index={0}
       />
-      {db.map((item, index) => {
-        if (item.listID === id) {
-          return (
-            <div key={item.id}>
-              <ItemCard
-                title={title}
-                item={item}
-                index={index}
-                onDragEnter={onDragEnter}
-                onDragOver={onDragOver}
-                onDrop={(e) => onDrop(e, index)}
-              />
-              <OverlayZone
-                height={draggedItemHeight}
-                onDrop={(e) => onDrop(e, index + 1)}
-                onDragEnter={onDragEnter}
-                index={index}
-              />
-            </div>
-          );
-        }
-        return null;
-      })}
+      {db
+        .sort((a, b) => a.itemIndex - b.itemIndex)
+        .map((item, index) => {
+          if (item.listID === id) {
+            return (
+              <div key={item.id}>
+                <ItemCard
+                  title={title}
+                  item={item}
+                  index={index}
+                  onDragEnter={onDragEnter}
+                  onDragOver={onDragOver}
+                  onDrop={(e) => onDrop(e, index)}
+                />
+                <OverlayZone
+                  height={draggedItemHeight}
+                  onDrop={(e) => onDrop(e, index + 1)}
+                  onDragEnter={onDragEnter}
+                  index={index}
+                />
+              </div>
+            );
+          }
+          return null;
+        })}
       {showInput ? (
         <div className="flex-col">
           <textarea
