@@ -65,7 +65,7 @@ type Props = {
   boards: Board[];
   addList: (title: string, boardID: string, indexInList: number) => void;
   getListsOfBoard: (boardID: string) => Promise<boolean>;
-  getItem: (listIDs: any) => void;
+  getItem: (listIDs?: any, listID?: string) => void;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -116,6 +116,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
       { id: boardDocID },
       { merge: true }
     );
+    getBoards(userID);
   };
 
   const getBoards = async (userID: string) => {
@@ -178,28 +179,22 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
     await setDoc(doc(database, "items", id), { id: id }, { merge: true });
 
+    await getItem();
+
     // const id = (db.length + 1).toString();
     // setDB([...db, { id, title, listID }]);
   };
 
-  const getItem = async (listIDs: string[]) => {
-    console.log(listIDs);
-
+  const getItem = async () => {
     const itemRef = collection(database, "items");
-    const recivedList: any = [];
+    const receivedList: any = [];
 
-    for (const item of listIDs) {
-      console.log(item);
+    const docs = await getDocs(itemRef);
+    docs.docs.forEach((doc) => {
+      receivedList.push({ id: doc.id, ...doc.data() });
+    });
 
-      const q = query(itemRef, where("listID", "==", item));
-      const docs = await getDocs(q);
-
-      docs.docs.forEach((doc) => {
-        recivedList.push(doc.data());
-      });
-    }
-
-    setDB(recivedList);
+    setDB(receivedList);
   };
 
   const addList = async (
@@ -211,6 +206,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     const listRef = collection(database, "lists");
 
     await addDoc(listRef, { id: id, title, boardID, indexInList });
+    getListsOfBoard(boardID);
   };
 
   const moveItem = async (index: number, item: Item) => {

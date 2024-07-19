@@ -1,32 +1,23 @@
-import { Router, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Board from "./pages/Board";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Boards from "./pages/Boards";
-import Input from "./Input";
+import Navbar from "./components/Navbar"; // Navbar bileşenini içe aktarıyoruz
 
 function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Home />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/boards",
-      element: <Boards />,
-    },
-    {
-      path: "/board/:id",
-      element: <Board />,
-    },
-  ]);
-
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Navbar /> {/* Navbar bileşenini buraya ekliyoruz */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/boards" element={<Boards />} />
+        <Route path="/board/:id" element={<Board />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

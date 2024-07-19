@@ -1,9 +1,9 @@
 #root {
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
-  background-color: #0f8bc4;
+  background-color: #232527;
   max-width: 1920px;
   overflow-x: auto;
   height: 100vh;
@@ -90,7 +90,6 @@
   padding: 10px;
   overflow-y: auto;
   max-height: 90vh;
-  height: 100%;
 }
 
 .list:active {
@@ -128,4 +127,78 @@
 
 .input-text {
   color: #a4a4a4;
+}
+
+.list-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.avatar-menu {
+  height: 200px;
+  width: 200px;
+  position: absolute;
+  background-color: #000000;
+  right: 10px;
+  top: 10px;
+  color: white;
+}
+
+.showMenu {
+  background-color: #365160;
+  width: 300px;
+  position: absolute;
+  right: 10px;
+  top: 96px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border: 1px solid rgb(15, 25, 29);
+  border-radius: 5px;
+}
+
+.hideMenu {
+  background-color: #ffc400;
+  position: absolute;
+  right: 10px;
+  top: 84px;
+  height: 0;
+  overflow-y: hidden;
+}
+
+.show-create-board-div {
+  background-color: #485459;
+  z-index: 100;
+  position: absolute;
+  top: 96px;
+  padding: 10px;
+  width: 300px;
+}
+
+.hide-create-board-div {
+  z-index: 100;
+  position: absolute;
+  top: 100px;
+  padding: 10px;
+  height: 0;
+  overflow-y: hidden;
+}
+
+.boards-container {
+  padding: 20px;
+  max-width: 1289px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dark-bg {
+  background-color: #232527;
+}
+
+.board-search-input {
+  border: 1px solid #909293;
+  color: #909293;
+}
+
+.board-search-input.focused {
+  border: 2px solid rgb(72, 72, 107);
 }

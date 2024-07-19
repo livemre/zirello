@@ -51,6 +51,7 @@ const CreateList: FC<Props> = ({ boardID }) => {
   const _addList = () => {
     const listSize = lists.length;
     addList(title, boardID, listSize);
+    setTitle("");
   };
 
   if (showInput) {

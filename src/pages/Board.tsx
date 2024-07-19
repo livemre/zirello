@@ -6,8 +6,6 @@ import ListOverlayZone from "../components/ListOverlayZone";
 import { useParams } from "react-router-dom";
 
 const Board = () => {
-  const [isListsLoaded, setIsListsLoaded] = useState<boolean>(false);
-
   const { id } = useParams();
   const context = useContext(MainContext);
   if (!context) {
@@ -65,11 +63,7 @@ const Board = () => {
   };
 
   return (
-    <div className="flex flex-row justify-start">
-      <div className="flex-col">
-        <div>Hosgeldin {user && user.displayName}</div>
-        <img src={`${user ? user.photoURL : ""}`} width={200} height={200} />
-      </div>
+    <div className="flex flex-row justify-start list-container">
       {id && (
         <ListOverlayZone
           onDragEnter={onDragEnter}

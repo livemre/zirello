@@ -61,10 +61,11 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
   const _addItem = () => {
     const getIndex = db.length;
     addItem(_title, id, getIndex);
+    _setTitle("");
   };
 
   return (
-    <div className="w-80 min-w-80 h-full bg-gray-950 p-2 rounded-lg list">
+    <div className="w-80 min-w-80 bg-gray-950 p-2 rounded-lg list">
       <p className="text-gray-200 text-2xl">{title}</p>
       <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>

@@ -12,7 +12,7 @@ const Login = (props: Props) => {
     throw new Error("No Context");
   }
 
-  const { setUser, addUser } = context;
+  const { setUser, addUser, user } = context;
 
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
@@ -52,6 +52,11 @@ const Login = (props: Props) => {
         // ...
       });
   };
+
+  if (user) {
+    navigate("/boards");
+  }
+
   return <div onClick={signIn}>Login</div>;
 };
 
