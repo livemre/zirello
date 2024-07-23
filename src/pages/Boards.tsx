@@ -19,7 +19,7 @@ const Boards = (props: Props) => {
 
   useEffect(() => {
     console.log(search);
-    if (search !== null && search.length > 2) {
+    if (search.length > 2) {
       searchBoard();
     } else {
       setSearchedBoards([]);
@@ -53,7 +53,7 @@ const Boards = (props: Props) => {
   };
 
   const searchBoard = () => {
-    if (search) {
+    if (search.length > 2) {
       const filteredBoards = boards.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
@@ -82,26 +82,34 @@ const Boards = (props: Props) => {
         </div>
       </div>
       <div className="grid grid-cols-5 gap-4">
-        {search === ""
+        {search.length <= 2
           ? boards.map((item) => (
               <div
                 key={item.id}
-                className="w-60 min-w-60 h-20 bg-blue-400 hover:bg-blue-300 cursor-pointer rounded-md"
+                className="w-60 min-w-60 h-32 cursor-pointer rounded-md"
                 onClick={() => handleLinkClick(item.id)}
+                style={{
+                  backgroundImage: `url(${item.bgImage})`,
+                  backgroundSize: "cover",
+                }}
               >
                 <div className="flex gap-4 m-3">
-                  <p>{item.name}</p>
+                  <p className="p-3 bg-slate-500 text-slate-300">{item.name}</p>
                 </div>
               </div>
             ))
           : searchedBoards.map((item) => (
               <div
                 key={item.id}
-                className="w-60 min-w-60 h-20 bg-blue-400 hover:bg-blue-300 cursor-pointer rounded-md"
+                className="w-60 min-w-60 h-32 cursor-pointer rounded-md"
                 onClick={() => handleLinkClick(item.id)}
+                style={{
+                  backgroundImage: `url(${item.bgImage})`,
+                  backgroundSize: "cover",
+                }}
               >
                 <div className="flex gap-4 m-3">
-                  <p>{item.name}</p>
+                  <p className="p-3 bg-slate-500 text-slate-300">{item.name}</p>
                 </div>
               </div>
             ))}

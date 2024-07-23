@@ -1,12 +1,17 @@
 import React, { DragEvent, useContext, useEffect, useState } from "react";
 import CreateList from "../components/CreateList";
-import { MainContext, List as ListType } from "../context/Context";
+import {
+  MainContext,
+  List as ListType,
+  Board as BoardType,
+} from "../context/Context";
 import List from "../components/List";
 import ListOverlayZone from "../components/ListOverlayZone";
 import { useParams } from "react-router-dom";
 
 const Board = () => {
   const { id } = useParams();
+  const [boardDetails, setBoardDetails] = useState<BoardType | null>(null);
   const context = useContext(MainContext);
   if (!context) {
     throw new Error("No Context");
@@ -20,7 +25,20 @@ const Board = () => {
     user,
     getListsOfBoard,
     getItem,
+    getBoardDetails,
   } = context;
+
+  useEffect(() => {
+    _getBoardDetails();
+  }, [id]);
+
+  const _getBoardDetails = async () => {
+    if (id) {
+      const data = await getBoardDetails(id);
+      console.log(data);
+      setBoardDetails(data);
+    }
+  };
 
   // İlk useEffect, id değiştiğinde veya lists güncellendiğinde çalışacak
   useEffect(() => {
@@ -63,7 +81,13 @@ const Board = () => {
   };
 
   return (
-    <div className="flex flex-row justify-start list-container">
+    <div
+      className="flex flex-row justify-start list-container h-full"
+      style={{
+        backgroundImage: `url(${boardDetails?.bgImage})`,
+        backgroundSize: "cover",
+      }}
+    >
       {id && (
         <ListOverlayZone
           onDragEnter={onDragEnter}

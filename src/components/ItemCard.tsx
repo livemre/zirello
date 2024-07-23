@@ -2,6 +2,10 @@
 import { DragEvent, FC, useContext, useRef, useState } from "react";
 import { Item, MainContext } from "../context/Context";
 import { IoCloseSharp } from "react-icons/io5";
+import { IoClipboard } from "react-icons/io5";
+
+import ItemCardDescription from "./ItemCardDescription";
+import ItemCardComments from "./ItemCardComments";
 
 type Props = {
   item: Item;
@@ -52,16 +56,30 @@ const ItemCard: FC<Props> = ({
   return (
     <>
       {showModal ? (
-        <div className="modal flex-col">
-          <IoCloseSharp
-            size={32}
-            color="black"
-            className="modal-close-icon"
-            onClick={() => setShowModal(false)}
-          />
-          <h1>{item.title}</h1>
-          <h2>{title} - Panosunda</h2>
-        </div>
+        <>
+          <div className="fixed inset-0 bg-black opacity-70 z-40"></div>
+          <div className="modal flex-col items-start justify-start">
+            <IoCloseSharp
+              size={32}
+              color="#94a3b8"
+              className="modal-close-icon hover:bg-slate-600"
+              onClick={() => setShowModal(false)}
+            />
+            <div className="flex justify-start items-center mt-8">
+              <IoClipboard className="" size={20} color="#94a3b8" />
+              <h1 className="text-1xl ml-2 text-slate-400">{item.title}</h1>
+            </div>
+
+            <h2 className="text-slate-400 ml-8">In list - {title}</h2>
+
+            <div className="w-full mt-8">
+              <ItemCardDescription item={item} />
+            </div>
+            <div className="w-full mt-8">
+              <ItemCardComments item={item} />
+            </div>
+          </div>
+        </>
       ) : (
         ""
       )}
@@ -71,7 +89,7 @@ const ItemCard: FC<Props> = ({
         onDragStart={(e) => onDragStart(e, item)}
         onDragOver={onDragOver}
         draggable
-        className="text-white m-1 bg-gray-800 card rounded-lg"
+        className="text-white m-1 bg-gray-800 rounded-lg"
       >
         <p>{item.title}</p>
         <p className="text-white">{index}</p>

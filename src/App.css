@@ -79,21 +79,32 @@
   background-color: rgb(43, 255, 0);
 }
 
-.card {
-}
-
-.card:active {
-  opacity: 0.8;
-}
-
 .list {
   padding: 10px;
   overflow-y: auto;
   max-height: 90vh;
 }
 
-.list:active {
-  opacity: 0.8;
+.modal-create-board {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: auto;
+  background-color: rgba(
+    51,
+    51,
+    51,
+    0.9
+  ); /* İçeriğin arka plan rengini değiştirdim */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge ekledim */
+  padding: 20px;
+  display: flex;
+  justify-content: start;
+  align-items: flex-start;
+  z-index: 1000;
+  border-radius: 10px; /* Köşeleri yuvarlattım */
 }
 
 .modal {
@@ -101,13 +112,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80%;
+  width: 600px;
   height: 80%;
-  background-color: rgba(
-    255,
-    255,
-    255,
-    0.9
+  background-color: rgb(
+    31,
+    41,
+    55
   ); /* İçeriğin arka plan rengini değiştirdim */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge ekledim */
   padding: 20px;
