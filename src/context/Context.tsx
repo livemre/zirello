@@ -47,6 +47,12 @@ export type BGType = {
   url: string;
 };
 
+export type ItemComment = {
+  comment: string;
+  createdAt: Timestamp;
+  id: string;
+};
+
 type Props = {
   addItem: (title: string, listID: string, index: number) => void;
   //addList: (title: string) => void;
@@ -82,7 +88,13 @@ type Props = {
   addDescToItem: (desc: string, id: string) => Promise<boolean>;
   getDecsForItem: (id: string) => Promise<string>;
   updateDesc: (id: string, desc: string) => Promise<boolean>;
-  addCommentToItem: (ItemID: string, comment: string) => void;
+  addCommentToItem: (ItemID: string, comment: string) => Promise<boolean>;
+  getItemComments: (itemID: string) => Promise<ItemComment[]>;
+  updateComment: (
+    itemID: string,
+    comment: string,
+    commentID: string
+  ) => Promise<boolean>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -101,21 +113,61 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
 
-  const addCommentToItem = async (itemID: string, comment: string) => {
+  const updateComment = async (
+    itemID: string,
+    comment: string,
+    commentID: string
+  ): Promise<boolean> => {
+    try {
+      const itemRef = doc(database, "items", itemID);
+      const commentRef = doc(itemRef, "comments", commentID);
+      await setDoc(commentRef, { comment: comment }, { merge: true });
+      console.log(comment);
+
+      console.log("Update comment");
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const getItemComments = async (itemID: string): Promise<ItemComment[]> => {
     const itemRef = doc(database, "items", itemID);
-    const commentsCollectionRef = collection(itemRef, "comments");
-
-    const result = await addDoc(commentsCollectionRef, {
-      createdAt: serverTimestamp(),
-      comment: comment,
+    const commentsRef = collection(itemRef, "comments");
+    const allComments = await getDocs(commentsRef);
+    let comments: ItemComment[] = [];
+    allComments.forEach((item) => {
+      const comment = item.data() as ItemComment;
+      comments.push(comment);
+      console.log(comment.comment);
     });
-    const docID = result.id;
+    return comments;
+  };
 
-    const commentRef = doc(commentsCollectionRef, docID);
+  const addCommentToItem = async (
+    itemID: string,
+    comment: string
+  ): Promise<boolean> => {
+    try {
+      const itemRef = doc(database, "items", itemID);
+      const commentsCollectionRef = collection(itemRef, "comments");
 
-    console.log(result.id);
+      const result = await addDoc(commentsCollectionRef, {
+        createdAt: serverTimestamp(),
+        comment: comment,
+      });
+      const docID = result.id;
 
-    await setDoc(commentRef, { id: docID }, { merge: true });
+      const commentRef = doc(commentsCollectionRef, docID);
+
+      console.log(result.id);
+
+      await setDoc(commentRef, { id: docID }, { merge: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const updateDesc = async (id: string, desc: string): Promise<boolean> => {
@@ -423,6 +475,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         getDecsForItem,
         updateDesc,
         addCommentToItem,
+        getItemComments,
+        updateComment,
       }}
     >
       {children}

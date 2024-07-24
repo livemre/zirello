@@ -47,7 +47,7 @@
 
 .showZone {
   opacity: 1;
-  border: 1px dashed #a4a4a4;
+  border: 20px dashed #a4a4a4;
   background-color: #ff0000;
 }
 
@@ -126,6 +126,7 @@
   align-items: center;
   z-index: 1000;
   border-radius: 10px; /* Köşeleri yuvarlattım */
+  overflow-y: scroll;
 }
 
 .modal-close-icon {

@@ -1,6 +1,7 @@
-import React, { FC, useContext, useState } from "react";
-import { Item, MainContext } from "../context/Context";
+import React, { FC, useContext, useEffect, useState } from "react";
+import { Item, ItemComment, MainContext } from "../context/Context";
 import { BsFillChatLeftTextFill } from "react-icons/bs";
+import SingleComment from "./SingleComment";
 
 type Props = {
   item: Item;
@@ -9,15 +10,38 @@ type Props = {
 const ItemCardComments: FC<Props> = ({ item }) => {
   const [comment, setComment] = useState<string>("");
   const [showCommentInput, setShowCommentInput] = useState<boolean>(false);
+  const [comments, setComments] = useState<ItemComment[]>([]);
+  const [editingItem, setEditingItem] = useState<string | null>(null);
 
   const context = useContext(MainContext);
   if (!context) {
     throw new Error("No context");
   }
 
-  const { user, addCommentToItem } = context;
+  const { user, addCommentToItem, getItemComments } = context;
 
   const photoURL = user && user.photoURL ? user.photoURL : "";
+
+  useEffect(() => {
+    _getItemComments();
+  }, [user]);
+
+  const _getItemComments = async () => {
+    const _comments = await getItemComments(item.id);
+    setComments(_comments);
+  };
+
+  const _addCommentToItem = async () => {
+    const result = await addCommentToItem(item.id, comment);
+    if (result) {
+      setShowCommentInput(false);
+      _getItemComments();
+    }
+  };
+
+  const onEditHandle = (id: string) => {
+    setEditingItem(id);
+  };
 
   return (
     <>
@@ -30,13 +54,13 @@ const ItemCardComments: FC<Props> = ({ item }) => {
         {showCommentInput ? (
           <div className="w-full pl-2">
             <textarea
-              className="bg-slate-400 w-full"
+              className="bg-slate-400 w-full p-2"
               onChange={(e) => setComment(e.target.value)}
             />
             <div className="flex w-full gap-3 mt-1">
               <button
                 className="bg-blue-400 hover:bg-blue-300 px-3 py-1 rounded-md"
-                onClick={() => addCommentToItem(item.id, comment)}
+                onClick={_addCommentToItem}
               >
                 Save
               </button>
@@ -57,6 +81,27 @@ const ItemCardComments: FC<Props> = ({ item }) => {
           </div>
         )}
       </div>
+      {comments && (
+        <div className="flex-col gap-3 mt-6 mb-8">
+          {user &&
+            comments
+              .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
+              .map((commentItem) => {
+                return (
+                  <SingleComment
+                    item={commentItem}
+                    profileImg={photoURL}
+                    user={user}
+                    canEditing={commentItem.id === editingItem}
+                    onEditHandle={onEditHandle}
+                    setEditingItem={setEditingItem}
+                    itemID={item.id}
+                    getComment={_getItemComments}
+                  />
+                );
+              })}
+        </div>
+      )}
     </>
   );
 };
