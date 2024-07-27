@@ -54,7 +54,7 @@ const ItemCard: FC<Props> = ({
   };
 
   return (
-    <>
+    <div className="flex flex-col w-full">
       {showModal ? (
         <>
           <div className="fixed inset-0 bg-black opacity-70 z-40"></div>
@@ -89,12 +89,12 @@ const ItemCard: FC<Props> = ({
         onDragStart={(e) => onDragStart(e, item)}
         onDragOver={onDragOver}
         draggable
-        className="text-white m-1 bg-gray-800 rounded-lg"
+        className="text-white m-1 bg-slate-800 rounded-lg py-3 "
       >
         <p>{item.title}</p>
-        <p className="text-white">{index}</p>
+        {/* <p className="text-white">{index}</p> */}
       </div>
-    </>
+    </div>
   );
 };
 

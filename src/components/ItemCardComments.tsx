@@ -12,6 +12,7 @@ const ItemCardComments: FC<Props> = ({ item }) => {
   const [showCommentInput, setShowCommentInput] = useState<boolean>(false);
   const [comments, setComments] = useState<ItemComment[]>([]);
   const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [deletingItem, setDeletingItem] = useState<string | null>(null);
 
   const context = useContext(MainContext);
   if (!context) {
@@ -41,6 +42,10 @@ const ItemCardComments: FC<Props> = ({ item }) => {
 
   const onEditHandle = (id: string) => {
     setEditingItem(id);
+  };
+
+  const onDeleteHandle = (id: string) => {
+    setDeletingItem(id);
   };
 
   return (
@@ -82,7 +87,7 @@ const ItemCardComments: FC<Props> = ({ item }) => {
         )}
       </div>
       {comments && (
-        <div className="flex-col gap-3 mt-6 mb-8">
+        <div className="flex-col gap-3 mt-6 mb-24">
           {user &&
             comments
               .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
@@ -97,6 +102,9 @@ const ItemCardComments: FC<Props> = ({ item }) => {
                     setEditingItem={setEditingItem}
                     itemID={item.id}
                     getComment={_getItemComments}
+                    canDelete={commentItem.id === deletingItem}
+                    setDeletingItem={setDeletingItem}
+                    onDeleteHandle={onDeleteHandle}
                   />
                 );
               })}

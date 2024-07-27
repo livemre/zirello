@@ -57,7 +57,7 @@ const CreateList: FC<Props> = ({ boardID }) => {
   if (showInput) {
     return (
       <div
-        className="flex-col items-start justify-start w-80 bg-black p-2 rounded-lg h-fit"
+        className="flex-col items-start justify-start w-72 bg-black p-2 rounded-lg h-fit m-3"
         ref={inputRef}
       >
         <input
@@ -88,7 +88,7 @@ const CreateList: FC<Props> = ({ boardID }) => {
 
   return (
     <div
-      className="w-80 bg-slate-200 flex items-center justify-start p-3 gap-2 hover:bg-slate-400 rounded-lg cursor-pointer h-fit m-3"
+      className="w-72 bg-slate-200 flex items-center justify-start p-3 gap-2 hover:bg-slate-400 rounded-lg cursor-pointer h-fit m-3"
       onClick={prepareList}
     >
       <CiSquarePlus size={16} />

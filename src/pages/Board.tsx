@@ -8,10 +8,14 @@ import {
 import List from "../components/List";
 import ListOverlayZone from "../components/ListOverlayZone";
 import { useParams } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
 
 const Board = () => {
   const { id } = useParams();
   const [boardDetails, setBoardDetails] = useState<BoardType | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
+
   const context = useContext(MainContext);
   if (!context) {
     throw new Error("No Context");
@@ -45,7 +49,8 @@ const Board = () => {
     if (id) {
       getListsOfBoard(id)
         .then(() => console.log("Lists loaded successfully"))
-        .catch((error) => console.error("Lists cannot be loaded", error));
+        .catch((error) => console.error("Lists cannot be loaded", error))
+        .then(() => setLoading(false));
     }
   }, [id]);
 
@@ -79,6 +84,14 @@ const Board = () => {
     e.preventDefault();
     console.log("Board drag enter");
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-full">
+        <ClipLoader size={48} className="text-slate-100" color="white" />
+      </div>
+    );
+  }
 
   return (
     <div

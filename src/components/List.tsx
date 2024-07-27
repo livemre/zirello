@@ -65,11 +65,11 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
   };
 
   return (
-    <div className="w-80 min-w-80 bg-gray-950 p-2 rounded-lg list">
+    <div className="w-72 min-w-72 bg-gray-950 p-2 rounded-xl list m-3 flex flex-col items-start justify-center">
       <p className="text-gray-200 text-2xl">{title}</p>
-      <p className="text-gray-200 text-2xl">{id}</p>
-      <p className="text-gray-200 text-2xl">{index}</p>
-      <p className="text-gray-200 text-2xl">{indexInList}</p>
+      {/* <p className="text-gray-200 text-2xl">{id}</p> */}
+      {/* <p className="text-gray-200 text-2xl">{index}</p>
+      <p className="text-gray-200 text-2xl">{indexInList}</p> */}
 
       <OverlayZone
         height={draggedItemHeight}
@@ -82,7 +82,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
         .map((item, index) => {
           if (item.listID === id) {
             return (
-              <div key={item.id}>
+              <div key={item.id} className="w-full">
                 <ItemCard
                   title={title}
                   item={item}
@@ -131,7 +131,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
           onClick={() => {
             setShowInput(true);
           }}
-          className="border text-white border-gray-100 hover:bg-gray-800 hover:text-gray-200 cursor-pointer py-2 rounded-lg"
+          className="border text-white border-gray-100 hover:bg-gray-800 hover:text-gray-200 cursor-pointer py-2 rounded-lg w-full"
         >
           + Kart Ekle
         </div>

@@ -47,13 +47,14 @@
 
 .showZone {
   opacity: 1;
-  border: 20px dashed #a4a4a4;
+  border: 1px dashed #a4a4a4;
   background-color: #ff0000;
 }
 
 .hideZone {
   opacity: 0;
   background-color: #f6ff00;
+  height: 30px;
 }
 
 .hide-list-overlay {
@@ -80,7 +81,6 @@
 }
 
 .list {
-  padding: 10px;
   overflow-y: auto;
   max-height: 90vh;
 }
@@ -156,7 +156,6 @@
 }
 
 .showMenu {
-  background-color: #365160;
   width: 300px;
   position: absolute;
   right: 10px;
@@ -212,4 +211,7 @@
 
 .board-search-input.focused {
   border: 2px solid rgb(72, 72, 107);
+}
+
+.navbar {
 }

@@ -1,0 +1,8 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dikdörtgen -->
+  <rect x="10" y="10" width="180" height="80" rx="10" ry="10" style="fill:lightgray;stroke:black;stroke-width:2;" />
+  <!-- Metin -->
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="24" fill="black">
+    ZIRELLO
+  </text>
+</svg>

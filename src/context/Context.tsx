@@ -6,6 +6,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -77,8 +78,8 @@ type Props = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   addUser: (userID: string, email: string, displayName: string) => void;
-  getBoards: (userID: string) => void;
-  addBoard: (userID: string, name: string, bgImage: string) => void;
+  getBoards: (userID: string) => Promise<boolean>;
+  addBoard: (userID: string, name: string, bgImage: string) => Promise<boolean>;
   boards: Board[];
   addList: (title: string, boardID: string, indexInList: number) => void;
   getListsOfBoard: (boardID: string) => Promise<boolean>;
@@ -95,6 +96,7 @@ type Props = {
     comment: string,
     commentID: string
   ) => Promise<boolean>;
+  deleteComment: (itemID: string, commentID: string) => Promise<boolean>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -112,6 +114,20 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
+
+  const deleteComment = async (
+    itemID: string,
+    commentID: string
+  ): Promise<boolean> => {
+    try {
+      const itemRef = doc(database, "items", itemID);
+      const commentRef = doc(itemRef, "comments", commentID);
+      await deleteDoc(commentRef);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const updateComment = async (
     itemID: string,
@@ -232,28 +248,33 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     return null; // Eğer eşleşen belge yoksa null döndür
   };
 
-  const addBoard = async (userID: string, name: string, bgImage: string) => {
-    console.log("Add board " + userID);
-    console.log(name);
+  const addBoard = async (
+    userID: string,
+    name: string,
+    bgImage: string
+  ): Promise<boolean> => {
+    try {
+      const boardRef = collection(database, "boards");
+      const board = await addDoc(boardRef, {
+        name,
+        userID,
+        bgImage,
+      });
 
-    const boardRef = collection(database, "boards");
-    const board = await addDoc(boardRef, {
-      name,
-      userID,
-      bgImage,
-    });
+      const boardDocID = board.id;
 
-    const boardDocID = board.id;
-
-    await setDoc(
-      doc(database, "boards", boardDocID),
-      { id: boardDocID },
-      { merge: true }
-    );
-    getBoards(userID);
+      await setDoc(
+        doc(database, "boards", boardDocID),
+        { id: boardDocID },
+        { merge: true }
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
-  const getBoards = async (userID: string) => {
+  const getBoards = async (userID: string): Promise<boolean> => {
     try {
       const boardRef = collection(database, "boards");
       const q = query(boardRef, where("userID", "==", userID));
@@ -265,8 +286,10 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         boardsData.push({ ...boardData });
       });
       setBoards(boardsData);
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   };
 
@@ -477,6 +500,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         addCommentToItem,
         getItemComments,
         updateComment,
+        deleteComment,
       }}
     >
       {children}

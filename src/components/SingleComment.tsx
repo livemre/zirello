@@ -2,6 +2,7 @@ import React, { FC, useContext, useState } from "react";
 import { ItemComment, MainContext } from "../context/Context";
 import { User } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
+import { IoMdClose } from "react-icons/io";
 
 type Props = {
   item: ItemComment;
@@ -12,6 +13,9 @@ type Props = {
   setEditingItem: React.Dispatch<React.SetStateAction<string | null>>;
   itemID: string;
   getComment: () => Promise<void>;
+  setDeletingItem: React.Dispatch<React.SetStateAction<string | null>>;
+  canDelete: boolean;
+  onDeleteHandle: (id: string) => void;
 };
 
 const SingleComment: FC<Props> = ({
@@ -23,15 +27,19 @@ const SingleComment: FC<Props> = ({
   setEditingItem,
   getComment,
   itemID,
+  setDeletingItem,
+  canDelete,
+  onDeleteHandle,
 }) => {
   const [comment, setComment] = useState<string>(item.comment);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const context = useContext(MainContext);
   if (!context) {
     throw new Error("No Context");
   }
 
-  const { updateComment } = context;
+  const { updateComment, deleteComment } = context;
 
   const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return "";
@@ -58,6 +66,24 @@ const SingleComment: FC<Props> = ({
     if (result) {
       await getComment();
       setEditingItem(null);
+    }
+  };
+
+  const _deleteComment = () => {
+    setDeletingItem(item.id);
+    setEditingItem(null);
+    onDeleteHandle(item.id);
+    if (canDelete) {
+      setDeleteModal(true);
+    }
+  };
+
+  const _deleteCommentFromModal = async () => {
+    const result = await deleteComment(itemID, item.id);
+
+    if (result) {
+      await getComment();
+      setDeleteModal(false);
     }
   };
 
@@ -96,6 +122,37 @@ const SingleComment: FC<Props> = ({
           )}
         </div>
       </div>
+      {canDelete ? (
+        <div className="shadow-lg bg-slate-800  border border-slate-500  rounded-sm ml-24 flex-col items-center text-sm absolute w-96 p-3 text-slate-300">
+          <div className="flex items-center justify-between mb-2">
+            <div className=" flex flex-grow justify-center">
+              <p>Are you sure?</p>
+            </div>
+            <div className="">
+              <IoMdClose
+                size={18}
+                color="white"
+                onClick={() => {
+                  setDeletingItem(null);
+                }}
+              />
+            </div>
+          </div>
+
+          <p className="mb-2">
+            Deleting a comment is forever. There is no undo.
+          </p>
+
+          <button
+            className="bg-red-500 text-black px-2 py-1 rounded-md w-full"
+            onClick={_deleteCommentFromModal}
+          >
+            Delete Commnet
+          </button>
+        </div>
+      ) : (
+        ""
+      )}
       {canEditing ? (
         <div className="flex ml-8 p-2">
           <button
@@ -119,12 +176,18 @@ const SingleComment: FC<Props> = ({
         <div className="flex ml-8 p-2">
           <button
             className=" px-4 py-1 text-slate-300  underline text-sm"
-            onClick={() => onEditHandle(item.id)}
+            onClick={() => {
+              onEditHandle(item.id);
+              setDeletingItem(null);
+            }}
           >
             Edit
           </button>
 
-          <button className=" px-4 py-1 text-slate-300  underline text-sm">
+          <button
+            className=" px-4 py-1 text-slate-300  underline text-sm"
+            onClick={_deleteComment}
+          >
             Delete
           </button>
         </div>
