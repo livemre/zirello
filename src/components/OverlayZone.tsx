@@ -58,7 +58,7 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
         onDragEnter={_onDragEnter}
         onDragLeave={onDragLeave}
       >
-        <div className="min-h-3"></div>
+        <div className="min-h-23"></div>
       </div>
     </div>
   );

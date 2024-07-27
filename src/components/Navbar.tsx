@@ -42,7 +42,7 @@ const Navbar = (props: Props) => {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex">
             <Link to={"/"}>
-              <img src={Zirello} />
+              <h1 className="text-white text-3xl">Zirello</h1>
             </Link>
           </div>
           <Link to={"/login"}>

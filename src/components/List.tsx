@@ -71,18 +71,20 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
       {/* <p className="text-gray-200 text-2xl">{index}</p>
       <p className="text-gray-200 text-2xl">{indexInList}</p> */}
 
-      <OverlayZone
-        height={draggedItemHeight}
-        onDrop={(e) => onDrop(e, 0)}
-        onDragEnter={onDragEnter}
-        index={0}
-      />
+      <div className="h-full w-full">
+        <OverlayZone
+          height={draggedItemHeight}
+          onDrop={(e) => onDrop(e, 0)}
+          onDragEnter={onDragEnter}
+          index={0}
+        />
+      </div>
       {db
         .sort((a, b) => a.itemIndex - b.itemIndex)
         .map((item, index) => {
           if (item.listID === id) {
             return (
-              <div key={item.id} className="w-full">
+              <div key={item.id} className="w-full h-full">
                 <ItemCard
                   title={title}
                   item={item}
@@ -91,25 +93,28 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
                   onDragOver={onDragOver}
                   onDrop={(e) => onDrop(e, index)}
                 />
-                <OverlayZone
-                  height={draggedItemHeight}
-                  onDrop={(e) => onDrop(e, index + 1)}
-                  onDragEnter={onDragEnter}
-                  index={index}
-                />
+                <div className="h-full w-full">
+                  <OverlayZone
+                    height={draggedItemHeight}
+                    onDrop={(e) => onDrop(e, index + 1)}
+                    onDragEnter={onDragEnter}
+                    index={index}
+                  />
+                </div>
               </div>
             );
           }
           return null;
         })}
       {showInput ? (
-        <div className="flex-col">
+        <div className="flex-col w-full">
           <textarea
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               _setTitle(e.target.value)
             }
             className="w-full p-2 rounded-lg mb-2 bg-gray-700 text-white"
-            placeholder="Bu kart için bir başlık girin..."
+            placeholder="Add title for this card..."
+            value={_title}
           />
           <div className="flex justify-start mb-2">
             <button

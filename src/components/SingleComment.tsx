@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import { ItemComment, MainContext } from "../context/Context";
 import { User } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
@@ -31,8 +31,9 @@ const SingleComment: FC<Props> = ({
   canDelete,
   onDeleteHandle,
 }) => {
-  const [comment, setComment] = useState<string>(item.comment);
+  const [comment, setComment] = useState<string>("");
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [editingComment, setEditingComment] = useState<string>("");
 
   const context = useContext(MainContext);
   if (!context) {
@@ -40,6 +41,10 @@ const SingleComment: FC<Props> = ({
   }
 
   const { updateComment, deleteComment } = context;
+
+  useEffect(() => {
+    setEditingComment(item.comment);
+  }, [onEditHandle]);
 
   const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return "";
@@ -60,7 +65,7 @@ const SingleComment: FC<Props> = ({
     console.log(itemID);
     console.log(item.id);
 
-    const result = await updateComment(itemID, comment, item.id);
+    const result = await updateComment(itemID, editingComment, item.id);
     console.log(result);
 
     if (result) {
@@ -111,8 +116,8 @@ const SingleComment: FC<Props> = ({
               <textarea
                 className="w-full p-2 bg-slate-500"
                 placeholder={item.comment}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                onChange={(e) => setEditingComment(e.target.value)}
+                value={editingComment}
               />
             </div>
           ) : (

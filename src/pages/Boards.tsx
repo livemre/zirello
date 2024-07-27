@@ -104,6 +104,7 @@ const Boards = (props: Props) => {
         if (result) {
           getBoards(user.uid);
           setShowCreateMenu(false);
+          setBoardTitle("");
         }
       }
     }
@@ -211,7 +212,7 @@ const Boards = (props: Props) => {
               {selectedBG === null ? (
                 <ClipLoader size={32} color="white" />
               ) : (
-                <div className="h-32 flex items-center justify-center w-full">
+                <div className="h-32 flex items-center justify-center w-full mb-3">
                   <div
                     className="p-4 items-center w-full justify-center"
                     style={{
@@ -238,7 +239,7 @@ const Boards = (props: Props) => {
               </p>
 
               <input
-                className="w-full rounded-lg p-3 bg-slate-600"
+                className="w-full rounded-lg p-3 bg-slate-600 text-slate-300"
                 onChange={(e) => setBoardTitle(e.target.value)}
               />
 
@@ -278,7 +279,7 @@ const Boards = (props: Props) => {
               </div>
               {message && <p>{message}</p>}
               <button
-                className="p-3 bg-slate-400 hover:bg-slate-500 w-full mt-2 rounded-lg"
+                className="p-3 bg-blue-400 hover:bg-slate-500 w-full mt-2 rounded-lg"
                 onClick={_addBoard}
               >
                 CREATE

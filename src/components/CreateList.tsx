@@ -48,10 +48,12 @@ const CreateList: FC<Props> = ({ boardID }) => {
     setShowInput((prev) => !prev);
   };
 
-  const _addList = () => {
+  const _addList = async () => {
     const listSize = lists.length;
-    addList(title, boardID, listSize);
-    setTitle("");
+    const result = await addList(title, boardID, listSize);
+    if (result) {
+      setTitle("");
+    }
   };
 
   if (showInput) {
@@ -62,10 +64,11 @@ const CreateList: FC<Props> = ({ boardID }) => {
       >
         <input
           className="bg-slate-600 p-3 text-white flex w-full rounded-lg mb-2"
-          placeholder="Liste basligi girin..."
+          placeholder="Add list title..."
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setTitle(e.target.value)
           }
+          value={title}
         />
 
         <div className="flex justify-between w-full gap-1">
@@ -73,7 +76,7 @@ const CreateList: FC<Props> = ({ boardID }) => {
             className="bg-blue-400 hover:bg-blue-500 px-8 py-3 flex-1 rounded-lg"
             onClick={_addList}
           >
-            Listeye Ekle...
+            Add List...
           </button>
           <button
             className="bg-slate-900 hover:bg-slate-600 px-3 py-3 rounded-lg"

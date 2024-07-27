@@ -80,7 +80,7 @@ const ListOverlayZone: FC<Props> = ({
       className={`${show ? "show-list-overlay" : "hide-list-overlay"}`}
       style={{ minWidth: show ? "300px" : undefined }}
     >
-      <p className="text-white">{index}</p>
+      <div className=""></div>
     </div>
   );
 };

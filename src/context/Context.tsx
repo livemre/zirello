@@ -81,7 +81,11 @@ type Props = {
   getBoards: (userID: string) => Promise<boolean>;
   addBoard: (userID: string, name: string, bgImage: string) => Promise<boolean>;
   boards: Board[];
-  addList: (title: string, boardID: string, indexInList: number) => void;
+  addList: (
+    title: string,
+    boardID: string,
+    indexInList: number
+  ) => Promise<boolean>;
   getListsOfBoard: (boardID: string) => Promise<boolean>;
   getItem: (listIDs?: any, listID?: string) => void;
   getBGImages: () => Promise<BGType[]>;
@@ -371,12 +375,17 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     title: string,
     boardID: string,
     indexInList: number
-  ) => {
-    const id = uuidv4();
-    const listRef = collection(database, "lists");
+  ): Promise<boolean> => {
+    try {
+      const id = uuidv4();
+      const listRef = collection(database, "lists");
 
-    await addDoc(listRef, { id: id, title, boardID, indexInList });
-    getListsOfBoard(boardID);
+      await addDoc(listRef, { id: id, title, boardID, indexInList });
+      getListsOfBoard(boardID);
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const moveItem = async (index: number, item: Item) => {

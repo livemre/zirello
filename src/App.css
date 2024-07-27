@@ -48,27 +48,25 @@
 .showZone {
   opacity: 1;
   border: 1px dashed #a4a4a4;
-  background-color: #ff0000;
 }
 
 .hideZone {
-  opacity: 0;
-  background-color: #f6ff00;
-  height: 30px;
-}
-
-.hide-list-overlay {
-  opacity: 0;
-  width: 10px;
-  transition: opacity 0.5s;
+  opacity: 1;
+  background-color: #ffc4000e;
+  height: 20px;
+  min-height: 20px;
 }
 
 .show-list-overlay {
   opacity: 1;
   border: 1px dashed #a4a4a4;
   background-color: #000000;
-  margin: 0 10px;
-  transition: opacity 0.5s;
+}
+
+.hide-list-overlay {
+  opacity: 1;
+  width: 20px;
+  min-width: 20px;
 }
 
 .draggingItem {

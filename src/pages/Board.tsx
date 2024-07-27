@@ -95,6 +95,7 @@ const Board = () => {
 
   return (
     <div
+      draggable="false"
       className="flex flex-row justify-start list-container h-full"
       style={{
         backgroundImage: `url(${boardDetails?.bgImage})`,
