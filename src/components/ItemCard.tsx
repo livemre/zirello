@@ -92,7 +92,8 @@ const ItemCard: FC<Props> = ({
         className="text-white m-1 bg-slate-800 rounded-lg py-3 "
       >
         <p>{item.title}</p>
-        {/* <p className="text-white">{index}</p> */}
+        <p className="text-white">{index}</p>
+        <p className="text-white">{item.itemIndex}</p>
       </div>
     </div>
   );

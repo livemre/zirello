@@ -52,9 +52,27 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
 
   const onDrop = (e: DragEvent, index: number) => {
     e.preventDefault();
+    console.log("Active Item ItemIndex " + activeItem?.itemIndex);
 
-    if (activeItem) {
-      moveItem(index, activeItem);
+    if (activeItem?.itemIndex !== undefined && activeItem.itemIndex !== null) {
+      if (activeItem.itemIndex === 0) {
+        console.log("sanane");
+        moveItem(index - 1, activeItem);
+      } else if (index === 0) {
+        moveItem(0, activeItem);
+        console.log("0 item");
+        console.log("Index " + index);
+        console.log("Active Item " + activeItem.itemIndex);
+      } else if (index <= activeItem.itemIndex) {
+        moveItem(index, activeItem);
+        console.log("Index " + index);
+        console.log("Active Item " + activeItem.itemIndex);
+      } else if (index >= activeItem.itemIndex) {
+        moveItem(index - 1, activeItem);
+        console.log("Index " + index);
+        console.log("Active Item " + activeItem);
+      } else {
+      }
     }
   };
 
@@ -68,8 +86,8 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
     <div className="w-72 min-w-72 bg-gray-950 p-2 rounded-xl list m-3 flex flex-col items-start justify-center">
       <p className="text-gray-200 text-2xl">{title}</p>
       {/* <p className="text-gray-200 text-2xl">{id}</p> */}
-      {/* <p className="text-gray-200 text-2xl">{index}</p>
-      <p className="text-gray-200 text-2xl">{indexInList}</p> */}
+      <p className="text-gray-200 text-2xl">{index}</p>
+      {/* <p className="text-gray-200 text-2xl">{indexInList}</p> */}
 
       <div className="h-full w-full">
         <OverlayZone
@@ -77,6 +95,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
           onDrop={(e) => onDrop(e, 0)}
           onDragEnter={onDragEnter}
           index={0}
+          bg={"red"}
         />
       </div>
       {db
@@ -98,7 +117,8 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
                     height={draggedItemHeight}
                     onDrop={(e) => onDrop(e, index + 1)}
                     onDragEnter={onDragEnter}
-                    index={index}
+                    index={index + 1}
+                    bg={"yellow"}
                   />
                 </div>
               </div>

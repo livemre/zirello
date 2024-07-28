@@ -6,9 +6,10 @@ type Props = {
   onDrop: (e: DragEvent, index: number) => void;
   onDragEnter: (e: DragEvent) => void;
   index: number;
+  bg: string;
 };
 
-const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
+const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index, bg }) => {
   const [show, setShow] = useState(false);
 
   const context = useContext(MainContext);
@@ -49,17 +50,15 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index }) => {
   };
 
   return (
-    <div>
-      <div
-        onDrop={_onDrop}
-        onDragOver={onDragOver}
-        className={show ? "showZone" : "hideZone"}
-        style={{ height: show ? `${height}px` : undefined }}
-        onDragEnter={_onDragEnter}
-        onDragLeave={onDragLeave}
-      >
-        <div className="min-h-23"></div>
-      </div>
+    <div
+      onDrop={_onDrop}
+      onDragOver={onDragOver}
+      className={show ? "showZone" : "hideZone"}
+      style={{ height: show ? `${height}px` : undefined }}
+      onDragEnter={_onDragEnter}
+      onDragLeave={onDragLeave}
+    >
+      <div className="min-h-23 text-white"></div>
     </div>
   );
 };

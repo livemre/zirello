@@ -5,14 +5,16 @@ type Props = {
   onDragOver: (e: DragEvent) => void;
   onDragEnter: (e: DragEvent) => void;
   index: number;
-  boardID: string;
+
+  onDrop: (e: DragEvent, index: number) => void;
 };
 
 const ListOverlayZone: FC<Props> = ({
   onDragOver,
   onDragEnter,
   index,
-  boardID,
+
+  onDrop,
 }) => {
   const [show, setShow] = useState<boolean>(false);
 
@@ -41,15 +43,17 @@ const ListOverlayZone: FC<Props> = ({
       return;
     }
 
-    if (index === activeListIndex) {
-      return;
-    }
+    // if (index === activeListIndex) {
+    //   return;
+    // }
 
-    if (index === activeListIndex + 1) {
-      return;
-    }
+    // if (index === activeListIndex + 1) {
+    //   return;
+    // }
 
     onDragEnter(e);
+    console.log(index);
+
     setShow(true);
   };
 
@@ -59,16 +63,16 @@ const ListOverlayZone: FC<Props> = ({
     setShow(false);
   };
 
-  const onDrop = (e: React.DragEvent, index: number) => {
+  const _onDrop = (e: DragEvent, index: number) => {
     e.preventDefault();
-    console.log("Drop");
-    const draggedItemType = e.dataTransfer.getData("type");
-    if (draggedItemType !== "list") {
-      return;
-    }
+    console.log("EMRE " + e.dataTransfer.getData("type"));
 
-    setShow(false);
-    moveList(index, boardID);
+    if (e.dataTransfer.getData("type") !== "item") {
+      setShow(false);
+    }
+    setShow(false); // İsteğe bağlı: öğe bırakıldığında göstergeyi gizleyin
+
+    onDrop(e, index);
   };
 
   return (
@@ -76,11 +80,11 @@ const ListOverlayZone: FC<Props> = ({
       onDragLeave={onDragLeave}
       onDragEnter={_onDragEnter}
       onDragOver={_onDragOver}
-      onDrop={(e: React.DragEvent) => onDrop(e, index)}
+      onDrop={(e: React.DragEvent) => _onDrop(e, index)}
       className={`${show ? "show-list-overlay" : "hide-list-overlay"}`}
       style={{ minWidth: show ? "300px" : undefined }}
     >
-      <div className=""></div>
+      <div className="text-white">{index}</div>
     </div>
   );
 };

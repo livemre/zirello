@@ -30,6 +30,8 @@ const Board = () => {
     getListsOfBoard,
     getItem,
     getBoardDetails,
+    moveList,
+    activeList,
   } = context;
 
   useEffect(() => {
@@ -85,6 +87,42 @@ const Board = () => {
     console.log("Board drag enter");
   };
 
+  const onDrop = async (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    console.log("Drop");
+    const draggedItemType = e.dataTransfer.getData("type");
+    if (draggedItemType !== "list") {
+      return;
+    }
+
+    if (activeList?.indexInList !== null && id !== undefined) {
+      if (
+        id !== undefined &&
+        activeList?.indexInList !== null &&
+        activeList?.indexInList !== undefined
+      ) {
+        if (activeList?.indexInList === 0) {
+          console.log("sanane");
+          moveList(index - 1, id);
+        } else if (index === 0) {
+          moveList(0, id);
+          console.log("0 item");
+          console.log("Index " + index);
+          console.log("Active Item " + activeList?.indexInList);
+        } else if (index <= activeList?.indexInList) {
+          moveList(index, id);
+          console.log("Index " + index);
+          console.log("Active Item " + activeList?.indexInList);
+        } else if (index >= activeList?.indexInList) {
+          moveList(index - 1, id);
+          console.log("Index " + index);
+          console.log("Active Item " + activeList?.indexInList);
+        } else {
+        }
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-full">
@@ -107,7 +145,7 @@ const Board = () => {
           onDragEnter={onDragEnter}
           onDragOver={onDragOver}
           index={0}
-          boardID={id}
+          onDrop={(e) => onDrop(e, 0)}
         />
       )}
       <div className="flex">
@@ -129,7 +167,7 @@ const Board = () => {
                     onDragEnter={onDragEnter}
                     onDragOver={onDragOver}
                     index={index + 1}
-                    boardID={id}
+                    onDrop={(e) => onDrop(e, index + 1)}
                   />
                 )}
               </div>
