@@ -70,7 +70,7 @@ const ListOverlayZone: FC<Props> = ({
     if (e.dataTransfer.getData("type") !== "item") {
       setShow(false);
     }
-    setShow(false); // İsteğe bağlı: öğe bırakıldığında göstergeyi gizleyin
+    //setShow(false); // İsteğe bağlı: öğe bırakıldığında göstergeyi gizleyin
 
     onDrop(e, index);
   };

@@ -44,6 +44,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
   const onDragEnter = (e: DragEvent) => {
     e.preventDefault();
     setTargetColumnID(id);
+    console.log("TCID " + targetColumnID);
   };
 
   const onDragOver = (e: DragEvent) => {
@@ -55,7 +56,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
     console.log("Active Item ItemIndex " + activeItem?.itemIndex);
 
     if (activeItem?.itemIndex !== undefined && activeItem.itemIndex !== null) {
-      if (activeItem.itemIndex === 0) {
+      if (activeItem.itemIndex === 0 && activeItem.listID === targetColumnID) {
         console.log("sanane");
         moveItem(index - 1, activeItem);
       } else if (index === 0) {
@@ -85,7 +86,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
   return (
     <div className="w-72 min-w-72 bg-gray-950 p-2 rounded-xl list m-3 flex flex-col items-start justify-center">
       <p className="text-gray-200 text-2xl">{title}</p>
-      {/* <p className="text-gray-200 text-2xl">{id}</p> */}
+      <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>
       {/* <p className="text-gray-200 text-2xl">{indexInList}</p> */}
 

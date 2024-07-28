@@ -434,9 +434,14 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         ...doc.data(),
       }));
 
+      // Mevcut listelerin yedeğini al
+      let backupLists: any;
+
       // Verileri güncelle
       if (activeList) {
         setLists((prevLists) => {
+          backupLists = [...prevLists]; // Yedeği al
+
           const updatedLists = prevLists.filter(
             (listItem) => listItem.id !== activeList.id
           );
@@ -464,6 +469,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
             })
             .catch((error) => {
               console.error("Firebase güncellemesi sırasında hata: ", error);
+              // Firebase güncellemesi başarısız olursa eski durumu geri yükle
+              setLists(backupLists);
             });
 
           return updatedLists;
@@ -474,7 +481,6 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
       return false;
     }
   };
-
   return (
     <MainContext.Provider
       value={{

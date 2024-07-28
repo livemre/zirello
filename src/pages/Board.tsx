@@ -103,18 +103,18 @@ const Board = () => {
       ) {
         if (activeList?.indexInList === 0) {
           console.log("sanane");
-          moveList(index - 1, id);
+          await moveList(index - 1, id);
         } else if (index === 0) {
-          moveList(0, id);
+          await moveList(0, id);
           console.log("0 item");
           console.log("Index " + index);
           console.log("Active Item " + activeList?.indexInList);
         } else if (index <= activeList?.indexInList) {
-          moveList(index, id);
+          await moveList(index, id);
           console.log("Index " + index);
           console.log("Active Item " + activeList?.indexInList);
         } else if (index >= activeList?.indexInList) {
-          moveList(index - 1, id);
+          await moveList(index - 1, id);
           console.log("Index " + index);
           console.log("Active Item " + activeList?.indexInList);
         } else {
