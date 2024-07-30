@@ -29,6 +29,8 @@ const Boards = (props: Props) => {
   const [selectedBG, setSelectedBG] = useState<BGType | null>(null);
   const [bgImgs, setBgImgs] = useState<BGType[]>([]);
 
+  const createMenuRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     console.log(search);
     if (search.length > 2) {
@@ -37,6 +39,26 @@ const Boards = (props: Props) => {
       setSearchedBoards([]);
     }
   }, [search]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        createMenuRef.current &&
+        !createMenuRef.current.contains(e.target as Node)
+      ) {
+        setShowCreateMenu(false);
+        console.log(showCreateMenu);
+        console.log("Outside");
+      } else {
+        console.log("Inside");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const navigate = useNavigate();
 
@@ -199,7 +221,7 @@ const Boards = (props: Props) => {
         </div>
       )}
 
-      <div>
+      <div ref={createMenuRef}>
         {showCreateMenu ? (
           <div className="modal-create-board">
             <div className="flex flex-col items-start w-full">

@@ -43,13 +43,13 @@ const ListOverlayZone: FC<Props> = ({
       return;
     }
 
-    // if (index === activeListIndex) {
-    //   return;
-    // }
+    if (index === activeListIndex) {
+      return;
+    }
 
-    // if (index === activeListIndex + 1) {
-    //   return;
-    // }
+    if (index === activeListIndex + 1) {
+      return;
+    }
 
     onDragEnter(e);
     console.log(index);
@@ -81,11 +81,11 @@ const ListOverlayZone: FC<Props> = ({
       onDragEnter={_onDragEnter}
       onDragOver={_onDragOver}
       onDrop={(e: React.DragEvent) => _onDrop(e, index)}
-      className={`${show ? "show-list-overlay" : "hide-list-overlay"}`}
+      className={`${
+        show ? "show-list-overlay" : "hide-list-overlay"
+      } rounded-2xl my-3`}
       style={{ minWidth: show ? "300px" : undefined }}
-    >
-      <div className="text-white">{index}</div>
-    </div>
+    ></div>
   );
 };
 

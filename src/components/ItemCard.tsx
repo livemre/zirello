@@ -1,5 +1,5 @@
 // ItemCard.tsx
-import { DragEvent, FC, useContext, useRef, useState } from "react";
+import { DragEvent, FC, useContext, useEffect, useRef, useState } from "react";
 import { Item, MainContext } from "../context/Context";
 import { IoCloseSharp } from "react-icons/io5";
 import { IoClipboard } from "react-icons/io5";
@@ -25,6 +25,27 @@ const ItemCard: FC<Props> = ({
 }) => {
   const draggedItemRef = useRef<HTMLDivElement | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const detailsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        detailsRef.current &&
+        !detailsRef.current.contains(e.target as Node)
+      ) {
+        console.log("Outside");
+        setShowModal(false);
+      } else {
+        console.log("Inside");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const context = useContext(MainContext);
   if (!context) {
@@ -58,7 +79,10 @@ const ItemCard: FC<Props> = ({
       {showModal ? (
         <>
           <div className="fixed inset-0 bg-black opacity-70 z-40"></div>
-          <div className="modal flex-col items-start justify-start">
+          <div
+            className="modal flex-col items-start justify-start"
+            ref={detailsRef}
+          >
             <IoCloseSharp
               size={32}
               color="#94a3b8"

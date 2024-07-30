@@ -1,3 +1,17 @@
+/* Arka plan resminin sürüklenmesini engelle */
+body,
+html {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Draggable elementlerin sürükleme sırasında görünümünü kontrol et */
+.list-container .list {
+  -webkit-user-drag: element;
+  user-drag: element;
+  overflow: hidden;
+}
+
 #root {
   width: 100%;
   margin: 0 auto;
@@ -59,15 +73,14 @@
 
 .show-list-overlay {
   opacity: 1;
-  border: 1px dashed #a4a4a4;
+  border: 1px dashed #8dff8b;
   background-color: #000000;
 }
 
 .hide-list-overlay {
   opacity: 1;
-  width: 20px;
+  width: 40px;
   min-width: 20px;
-  background-color: red;
 }
 
 .draggingItem {
@@ -213,4 +226,9 @@
 }
 
 .navbar {
+}
+
+.dark-overlay {
+  background-color: rgba(0, 0, 0, 0.5); /* Siyah yarı saydam arka plan */
+  background-blend-mode: darken; /* Arka plan resmini karartmak için */
 }

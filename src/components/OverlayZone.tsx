@@ -18,12 +18,20 @@ const OverlayZone: FC<Props> = ({ height, onDrop, onDragEnter, index, bg }) => {
     throw new Error("No Context");
   }
 
-  const { activeDraggedType } = context;
+  const { activeDraggedType, activeItem } = context;
 
   const _onDragEnter = (e: DragEvent) => {
     if (activeDraggedType !== "item") {
       return;
     }
+
+    // if (activeItem?.itemIndex !== null || activeItem.itemIndex !== undefined) {
+    //   return;
+    // }
+
+    // if (index === activeItem?.itemIndex) {
+    //   return;
+    // }
 
     setShow(true);
     onDragEnter(e);

@@ -1,4 +1,10 @@
-import React, { DragEvent, useContext, useEffect, useState } from "react";
+import React, {
+  DragEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import CreateList from "../components/CreateList";
 import {
   MainContext,
@@ -13,8 +19,8 @@ import { ClipLoader } from "react-spinners";
 const Board = () => {
   const { id } = useParams();
   const [boardDetails, setBoardDetails] = useState<BoardType | null>(null);
-
   const [loading, setLoading] = useState<boolean>(true);
+  const [tempLists, setTempLists] = useState<ListType[]>([]);
 
   const context = useContext(MainContext);
   if (!context) {
@@ -46,7 +52,6 @@ const Board = () => {
     }
   };
 
-  // İlk useEffect, id değiştiğinde veya lists güncellendiğinde çalışacak
   useEffect(() => {
     if (id) {
       getListsOfBoard(id)
@@ -56,8 +61,8 @@ const Board = () => {
     }
   }, [id]);
 
-  // İkinci useEffect, lists değiştiğinde çalışacak
   useEffect(() => {
+    setTempLists(lists);
     const ids: any = [];
     lists.forEach((item) => {
       console.log("Item ID:", item.id);
@@ -72,6 +77,7 @@ const Board = () => {
     list: ListType,
     index: number
   ) => {
+    e.stopPropagation();
     setActiveList(list);
     e.dataTransfer.setData("type", "list");
     setActiveDraggedType("list");
@@ -95,31 +101,33 @@ const Board = () => {
       return;
     }
 
-    if (activeList?.indexInList !== null && id !== undefined) {
-      if (
-        id !== undefined &&
-        activeList?.indexInList !== null &&
-        activeList?.indexInList !== undefined
-      ) {
-        if (activeList?.indexInList === 0) {
-          console.log("sanane");
-          await moveList(index - 1, id);
-        } else if (index === 0) {
-          await moveList(0, id);
-          console.log("0 item");
-          console.log("Index " + index);
-          console.log("Active Item " + activeList?.indexInList);
-        } else if (index <= activeList?.indexInList) {
-          await moveList(index, id);
-          console.log("Index " + index);
-          console.log("Active Item " + activeList?.indexInList);
-        } else if (index >= activeList?.indexInList) {
-          await moveList(index - 1, id);
-          console.log("Index " + index);
-          console.log("Active Item " + activeList?.indexInList);
-        } else {
-        }
+    if (
+      activeList?.indexInList !== null &&
+      activeList?.indexInList !== undefined &&
+      id !== undefined
+    ) {
+      let newIndex = index;
+
+      if (activeList?.indexInList === 0) {
+        newIndex = index - 1;
+      } else if (index === 0) {
+        newIndex = 0;
+      } else if (index <= activeList?.indexInList) {
+        newIndex = index;
+      } else if (index >= activeList?.indexInList) {
+        newIndex = index - 1;
       }
+
+      const newLists = [...tempLists];
+      newLists.splice(activeList.indexInList, 1);
+      newLists.splice(newIndex, 0, activeList);
+
+      newLists.forEach((list, idx) => {
+        list.indexInList = idx;
+      });
+
+      setTempLists(newLists);
+      await moveList(newIndex, id, setTempLists, tempLists);
     }
   };
 
@@ -134,9 +142,10 @@ const Board = () => {
   return (
     <div
       draggable="false"
-      className="flex flex-row justify-start list-container h-full"
+      className="flex flex-row justify-start list-container h-full dark-overlay"
       style={{
         backgroundImage: `url(${boardDetails?.bgImage})`,
+        backgroundColor: "#dddddd",
         backgroundSize: "cover",
       }}
     >
@@ -148,8 +157,9 @@ const Board = () => {
           onDrop={(e) => onDrop(e, 0)}
         />
       )}
+
       <div className="flex">
-        {lists
+        {tempLists
           .sort((a, b) => a.indexInList - b.indexInList) // Listeleri indexInList değerine göre sırala
           .map((item, index) => {
             return (

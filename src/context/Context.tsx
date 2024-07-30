@@ -68,7 +68,13 @@ type Props = {
   moveItem: (index: number, item: Item) => void;
   activeList: List | undefined;
   setActiveList: React.Dispatch<React.SetStateAction<List | undefined>>;
-  moveList: (index: number, boardID: string) => Promise<boolean>;
+  moveList: (
+    index: number,
+    boardID: string,
+    setLists: Function,
+    lists: List[]
+  ) => Promise<boolean>;
+
   activeDraggedType: string;
   setActiveDraggedType: React.Dispatch<React.SetStateAction<string>>;
   activeListIndex: number;
@@ -421,7 +427,12 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const moveList = async (index: number, boardID: string): Promise<boolean> => {
+  const moveList = async (
+    index: number,
+    boardID: string,
+    setLists: Function,
+    lists: List[]
+  ): Promise<boolean> => {
     console.log("Move Item Context");
 
     try {
@@ -435,52 +446,51 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
       }));
 
       // Mevcut listelerin yedeğini al
-      let backupLists: any;
+      let backupLists = [...lists];
 
       // Verileri güncelle
       if (activeList) {
-        setLists((prevLists) => {
-          backupLists = [...prevLists]; // Yedeği al
+        const updatedLists = lists.filter(
+          (listItem) => listItem.id !== activeList.id
+        );
+        updatedLists.splice(index, 0, activeList);
 
-          const updatedLists = prevLists.filter(
-            (listItem) => listItem.id !== activeList.id
-          );
-          updatedLists.splice(index, 0, activeList);
-
-          // indexInList değerlerini güncelle
-          updatedLists.forEach((list, idx) => {
-            list.indexInList = idx;
-          });
-
-          console.log(updatedLists);
-
-          // Firebase'de toplu güncelleme işlemi
-          const batch = writeBatch(database);
-
-          updatedLists.forEach((list) => {
-            const listRef = doc(database, "lists", list.id);
-            batch.update(listRef, { indexInList: list.indexInList });
-          });
-
-          batch
-            .commit()
-            .then(() => {
-              console.log("Firebase güncellemesi başarılı");
-            })
-            .catch((error) => {
-              console.error("Firebase güncellemesi sırasında hata: ", error);
-              // Firebase güncellemesi başarısız olursa eski durumu geri yükle
-              setLists(backupLists);
-            });
-
-          return updatedLists;
+        // indexInList değerlerini güncelle
+        updatedLists.forEach((list, idx) => {
+          list.indexInList = idx;
         });
+
+        console.log(updatedLists);
+
+        // Yerel state'i hemen güncelle
+        setLists(updatedLists);
+
+        // Firebase'de toplu güncelleme işlemi
+        const batch = writeBatch(database);
+
+        updatedLists.forEach((list) => {
+          const listRef = doc(database, "lists", list.id);
+          batch.update(listRef, { indexInList: list.indexInList });
+        });
+
+        try {
+          await batch.commit();
+          console.log("Firebase güncellemesi başarılı");
+          return true;
+        } catch (error) {
+          console.error("Firebase güncellemesi sırasında hata: ", error);
+          // Firebase güncellemesi başarısız olursa eski durumu geri yükle
+          setLists(backupLists);
+          return false;
+        }
       }
-      return true;
+      return false;
     } catch (error) {
+      console.error("moveList fonksiyonunda hata: ", error);
       return false;
     }
   };
+
   return (
     <MainContext.Provider
       value={{

@@ -84,7 +84,7 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
   };
 
   return (
-    <div className="w-72 min-w-72 bg-gray-950 p-2 rounded-xl list m-3 flex flex-col items-start justify-center">
+    <div className="w-72 min-w-72 bg-gray-950 p-2  list m-3 flex flex-col items-start justify-center rounded-2xl">
       <p className="text-gray-200 text-2xl">{title}</p>
       <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>

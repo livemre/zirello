@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MainContext } from "../context/Context";
 import { getAuth } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,19 +9,35 @@ type Props = {};
 const Navbar = (props: Props) => {
   const context = useContext(MainContext);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-
-  const [loadingButton, setLoadingButton] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const profileRef = useRef<HTMLDivElement | null>(null);
 
   if (!context) {
     throw new Error("No Context");
   }
 
   const { user } = context;
-
   const auth = getAuth();
   const navigate = useNavigate();
-
   const photoURL = user && user.photoURL ? user.photoURL : "";
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const showMenuHandler = () => {
     setShowMenu((prev) => !prev);
@@ -38,7 +54,7 @@ const Navbar = (props: Props) => {
 
   if (!user) {
     return (
-      <div className="h-24  bg-gray-800 flex items-center">
+      <div className="h-24 bg-gray-800 flex items-center">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex">
             <Link to={"/"}>
@@ -58,7 +74,7 @@ const Navbar = (props: Props) => {
   }
 
   return (
-    <div className="h-24  bg-gray-800 flex items-center">
+    <div className="h-24 bg-gray-800 flex items-center ">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Link to={"/"}>
@@ -72,15 +88,17 @@ const Navbar = (props: Props) => {
           </div>
         </div>
 
-        <img
-          className="rounded-full"
-          src={photoURL}
-          width={64}
-          height={64}
-          onClick={showMenuHandler}
-        />
-        {showMenu ? (
-          <div className="showMenu">
+        <div ref={profileRef}>
+          <img
+            className="rounded-full"
+            src={photoURL}
+            width={64}
+            height={64}
+            onClick={showMenuHandler}
+          />
+        </div>
+        {showMenu && (
+          <div className="showMenu z-10 absolute right-0" ref={menuRef}>
             <ul>
               <li
                 className="p-3 bg-slate-800 cursor-pointer hover:bg-slate-700 text-slate-100"
@@ -90,8 +108,6 @@ const Navbar = (props: Props) => {
               </li>
             </ul>
           </div>
-        ) : (
-          ""
         )}
       </div>
     </div>
