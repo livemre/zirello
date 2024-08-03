@@ -15,6 +15,7 @@ import List from "../components/List";
 import ListOverlayZone from "../components/ListOverlayZone";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
+import { Timestamp } from "firebase/firestore";
 
 const Board = () => {
   const { id } = useParams();
@@ -38,11 +39,25 @@ const Board = () => {
     getBoardDetails,
     moveList,
     activeList,
+    updateLastUsingDate,
   } = context;
+
+  useEffect(() => {
+    _updateLastUsingDate();
+  }, [id]);
 
   useEffect(() => {
     _getBoardDetails();
   }, [id]);
+
+  const _updateLastUsingDate = async () => {
+    if (!id) {
+      return;
+    }
+    const date = Timestamp.now();
+    const result = await updateLastUsingDate(id, date);
+    console.log(result);
+  };
 
   const _getBoardDetails = async () => {
     if (id) {

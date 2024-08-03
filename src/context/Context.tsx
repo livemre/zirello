@@ -41,6 +41,9 @@ export type Board = {
   userID: string;
   id: string;
   bgImage: string;
+  lastUsingDate: Timestamp;
+  isFav: boolean;
+  createdDate: Timestamp;
 };
 
 export type BGType = {
@@ -107,6 +110,9 @@ type Props = {
     commentID: string
   ) => Promise<boolean>;
   deleteComment: (itemID: string, commentID: string) => Promise<boolean>;
+  updateLastUsingDate: (boardID: string, date: Timestamp) => Promise<boolean>;
+  makeBoardStarredToggle: (boardId: string) => Promise<boolean>;
+  setBoards: React.Dispatch<React.SetStateAction<Board[]>>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -124,6 +130,30 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
+
+  const makeBoardStarredToggle = async (boardID: string): Promise<boolean> => {
+    try {
+      const boardRef = doc(database, "boards", boardID);
+      const getIsFavValue = await getDoc(boardRef);
+      const result = getIsFavValue.data() as Board;
+      const _isFav = result.isFav;
+
+      setDoc(boardRef, { isFav: !_isFav }, { merge: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const updateLastUsingDate = async (boardID: string, date: Timestamp) => {
+    try {
+      const boardRef = doc(database, "boards", boardID);
+      await setDoc(boardRef, { lastUsingDate: date }, { merge: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const deleteComment = async (
     itemID: string,
@@ -264,11 +294,16 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     bgImage: string
   ): Promise<boolean> => {
     try {
+      const lastUsingDate = Timestamp.now();
+      const createdDate = Timestamp.now();
       const boardRef = collection(database, "boards");
       const board = await addDoc(boardRef, {
         name,
         userID,
         bgImage,
+        lastUsingDate,
+        isFav: false,
+        createdDate,
       });
 
       const boardDocID = board.id;
@@ -531,6 +566,9 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         getItemComments,
         updateComment,
         deleteComment,
+        updateLastUsingDate,
+        makeBoardStarredToggle,
+        setBoards,
       }}
     >
       {children}

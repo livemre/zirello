@@ -232,3 +232,22 @@ html {
   background-color: rgba(0, 0, 0, 0.5); /* Siyah yarı saydam arka plan */
   background-blend-mode: darken; /* Arka plan resmini karartmak için */
 }
+
+.board-background {
+  position: relative;
+  background-image: var(--bg-image);
+  background-color: #dddddd;
+  background-size: cover;
+  /* Other styles */
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9); /* Karartma */
+  z-index: 1;
+  pointer-events: none; /* Karartma katmanını tıklanamaz yapar */
+}
