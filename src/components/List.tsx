@@ -10,17 +10,37 @@ import React, {
 import { Item, MainContext } from "../context/Context";
 import OverlayZone from "./OverlayZone";
 import ItemCard from "./ItemCard"; // ItemCard'ı import edin
+import { list } from "firebase/storage";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 
 type Props = {
   title: string;
   id: string;
   index: number;
   indexInList: number;
+  boardID: string;
+  onDeleteList: () => void;
 };
 
-const List: FC<Props> = ({ title, id, index, indexInList }) => {
+const List: FC<Props> = ({
+  title,
+  id,
+  index,
+  indexInList,
+  onDeleteList,
+  boardID,
+}) => {
   const [showInput, setShowInput] = useState(false);
   const [_title, _setTitle] = useState<string>("");
+  const [editListTitle, setEditListTitle] = useState(false);
+  const [_updatedTitle, _setUpdatedTitle] = useState<string>("");
+  const [showDeleteListModal, setShowDeleteListModal] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    _setUpdatedTitle(title);
+  }, [title]);
 
   const context = useContext(MainContext);
   if (!context) {
@@ -35,6 +55,10 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
     targetColumnID,
     moveItem,
     draggedItemHeight,
+    setLists,
+    lists,
+    updateListTitle,
+    deleteList,
   } = context;
 
   useEffect(() => {
@@ -77,18 +101,109 @@ const List: FC<Props> = ({ title, id, index, indexInList }) => {
     }
   };
 
-  const _addItem = () => {
+  const _addItem = async () => {
     const getIndex = db.length;
-    addItem(_title, id, getIndex);
+
+    const result = await addItem(_title, id, getIndex);
+
+    if (!result) {
+      console.log("Error");
+    }
+
     _setTitle("");
+  };
+
+  const handleTitleFocus = async () => {
+    setEditListTitle(false);
+    if (_updatedTitle === "") {
+      return;
+    }
+
+    const _prevTitle = title;
+
+    setLists(
+      lists.map((list) => {
+        return list.id === id ? { ...list, title: _updatedTitle } : list;
+      })
+    );
+    const result = await updateListTitle(id, _updatedTitle);
+
+    if (!result) {
+      setLists(
+        lists.map((list) => {
+          return list.id === id ? { ...list, title: _prevTitle } : list;
+        })
+      );
+    }
+  };
+
+  const handleDeleteList = async () => {
+    const previousLists = lists;
+
+    const result = await deleteList(id, boardID);
+    if (result) {
+      onDeleteList();
+    }
   };
 
   return (
     <div className="w-72 min-w-72 bg-gray-950 p-2  list m-3 flex flex-col items-start justify-center rounded-2xl">
-      <p className="text-gray-200 text-2xl">{title}</p>
+      {editListTitle ? (
+        <input
+          value={_updatedTitle}
+          className="bg-transparent text-gray-200 text-lg w-full rounded-md border-0 focus:border-0"
+          autoFocus
+          onBlur={handleTitleFocus}
+          onChange={(e) => _setUpdatedTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleTitleFocus();
+            }
+          }}
+        />
+      ) : (
+        <div className="w-full relative">
+          <div className="flex items-center justify-between w-full">
+            <p
+              onClick={() => setEditListTitle(true)}
+              className="text-gray-200 text-lg font-semibold cursor-pointer"
+            >
+              {title}
+            </p>
+            <RiDeleteBin6Line
+              onClick={() => setShowDeleteListModal(true)}
+              size={16}
+              className="text-slate-200 hover:text-red-400 cursor-pointer"
+            />
+          </div>
+          {showDeleteListModal && (
+            <div className="modal-delete-list flex flex-col">
+              <div className="flex items-center justify-between mb-2 w-full">
+                <p className=" text-slate-200">
+                  Deleting a list is forever. There is no undo.
+                </p>
+                <IoMdClose
+                  size={18}
+                  color="white"
+                  onClick={() => {
+                    setShowDeleteListModal(false);
+                  }}
+                />
+              </div>
+
+              <button
+                className="bg-red-500 text-black px-2 py-1 rounded-md w-full"
+                onClick={handleDeleteList}
+              >
+                Delete List
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>
-      {/* <p className="text-gray-200 text-2xl">{indexInList}</p> */}
+      <p className="text-gray-200 text-2xl">{indexInList}</p>
 
       <div className="h-full w-full">
         <OverlayZone

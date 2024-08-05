@@ -28,6 +28,16 @@ const Board = () => {
     throw new Error("No Context");
   }
 
+  const onDeleteList = () => {
+    console.log("On delete list");
+    if (!id) {
+      return;
+    }
+    getListsOfBoard(id)
+      .then(() => console.log("Lists loaded successfully"))
+      .catch((error) => console.error("Lists cannot be loaded", error));
+  };
+
   const {
     lists,
     setActiveList,
@@ -63,14 +73,18 @@ const Board = () => {
     if (id) {
       const data = await getBoardDetails(id);
       console.log(data);
-      setBoardDetails(data);
     }
   };
+
+  useEffect(() => {}, [boardDetails]);
 
   useEffect(() => {
     if (id) {
       getListsOfBoard(id)
         .then(() => console.log("Lists loaded successfully"))
+        .then(() => {
+          getBoardDetails(id).then((data) => setBoardDetails(data));
+        })
         .catch((error) => console.error("Lists cannot be loaded", error))
         .then(() => setLoading(false));
     }
@@ -181,10 +195,12 @@ const Board = () => {
               <div className="flex list" key={item.id}>
                 <div draggable onDragStart={(e) => onDragStart(e, item, index)}>
                   <List
+                    onDeleteList={onDeleteList}
                     title={item.title}
                     id={item.id}
                     index={index}
                     indexInList={item.indexInList}
+                    boardID={item.boardID}
                   />
                 </div>
                 {id && (

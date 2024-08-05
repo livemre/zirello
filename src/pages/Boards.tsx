@@ -79,7 +79,7 @@ const Boards = (props: Props) => {
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 container mx-auto ">
       <LeftMenu />
       <div className="boards-container">
         {boards.some((item) => item.isFav) && (
@@ -127,17 +127,6 @@ const Boards = (props: Props) => {
         </div>
         <div className="flex justify-between w-full items-center mb-4">
           <p className="text-slate-300 text-1xl py-3">YOUR WORKSPACES</p>
-          <div className="flex items-center  relative p-1">
-            <IoIosSearch
-              size={18}
-              className=" absolute ml-5  pointer-events-none text-slate-400 "
-            />
-            <input
-              placeholder="search..."
-              className="pl-7 py-2 dark-bg ml-3 text-slate-400 border rounded-md"
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
         </div>
         {searchedBoards.length < 1 && search.length > 2 ? (
           <div className="w-full">

@@ -192,7 +192,7 @@ const CreateBoardButton: FC<Props> = ({ type }) => {
     return (
       <div>
         <FaPlus
-          size={18}
+          size={24}
           className="text-slate-400 hover:bg-slate-700 p-1"
           onClick={handleCreateMenu}
         />

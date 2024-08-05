@@ -36,17 +36,22 @@ const BoardCard: FC<Props> = ({ item }) => {
     const previousState = starClicked;
     setStarClicked(!previousState); // UI'yı hemen güncelle
 
+    setBoards(
+      boards.map((board) =>
+        board.id === item.id ? { ...board, isFav: !previousState } : board
+      )
+    );
+
     const result = await makeBoardStarredToggle(item.id);
     if (result) {
       // Eğer işlem başarılı olursa, context'teki boards listesini güncelle
-      setBoards(
-        boards.map((board) =>
-          board.id === item.id ? { ...board, isFav: !previousState } : board
-        )
-      );
     } else {
       // Eğer işlem başarısız olursa, UI'yı geri al
-      setStarClicked(previousState);
+      setBoards(
+        boards.map((board) =>
+          board.id === item.id ? { ...board, isFav: previousState } : board
+        )
+      );
     }
   };
 
@@ -66,13 +71,13 @@ const BoardCard: FC<Props> = ({ item }) => {
         <div className="absolute right-1 bottom-1">
           {starClicked ? (
             <FaStar
-              size={24}
+              size={16}
               onClick={handleStarClicked}
               className="text-yellow-400 star-icon"
             />
           ) : (
             <CiStar
-              size={24}
+              size={16}
               onClick={handleStarClicked}
               className="text-white star-icon"
             />

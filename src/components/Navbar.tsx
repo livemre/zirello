@@ -9,6 +9,8 @@ import StarredCard from "./StarredCard";
 import RecentCard from "./RecentCard";
 import NoStarred from "../assets/no_starred.svg";
 import CreateBoardButton from "./CreateBoardButton";
+import { IoSearchSharp } from "react-icons/io5";
+import NavbarSearchBoards from "./NavbarSearchBoards";
 
 type Props = {};
 
@@ -131,7 +133,7 @@ const Navbar = (props: Props) => {
   }
 
   return (
-    <div className="h-12 bg-slate-900 flex items-center border-b-1">
+    <div className="h-12 bg-slate-900 flex items-center border-b border-slate-600">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Link to={"/"}>
@@ -145,7 +147,9 @@ const Navbar = (props: Props) => {
           </div>
           <div className="relative" ref={recentButtonRef}>
             <div
-              className="text-slate-400 text-1xl mx-1 hover:bg-slate-600 px-4 py-1 cursor-pointer rounded ml-3 flex items-center"
+              className={`text-slate-400 text-1xl mx-1 hover:bg-slate-600 px-4 py-1 cursor-pointer rounded ml-3 flex items-center ${
+                showRecent && "bg-slate-600"
+              }`}
               onClick={() => setShowRecent((prev) => !prev)}
             >
               <h1 className=" text-left">Recent</h1>
@@ -156,7 +160,7 @@ const Navbar = (props: Props) => {
 
             {showRecent && (
               <div
-                className="absolute w-96 bg-slate-900  flex flex-col justify-start items-start rounded-md p-3 ml-3 mt-3 z-30"
+                className=" border border-slate-600 absolute w-96 bg-slate-900  flex flex-col justify-start items-start rounded-md p-3 ml-3 mt-3 z-30 shadow-2xl"
                 ref={recentMenuRef}
               >
                 <ul className="w-full text-left">
@@ -189,7 +193,7 @@ const Navbar = (props: Props) => {
 
             {showStar && (
               <div
-                className="absolute w-96 bg-slate-900 flex flex-col justify-start items-start rounded-md p-3 ml-3 mt-3 z-40"
+                className="absolute w-96 bg-slate-900 flex flex-col justify-start items-start rounded-md p-3 ml-3 mt-3 z-40 border border-slate-600 shadow-2xl"
                 ref={starMenuRef}
               >
                 <ul className="w-full text-left">
@@ -223,27 +227,30 @@ const Navbar = (props: Props) => {
           </div>
         </div>
 
-        <div ref={profileRef}>
-          <img
-            className="rounded-full"
-            src={photoURL}
-            width={32}
-            height={32}
-            onClick={showMenuHandler}
-          />
-        </div>
-        {showMenu && (
-          <div className="showMenu z-10 absolute right-0" ref={menuRef}>
-            <ul>
-              <li
-                className="p-3 bg-slate-800 cursor-pointer hover:bg-slate-700 text-slate-100"
-                onClick={signOutHandler}
-              >
-                Sign Out
-              </li>
-            </ul>
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          <NavbarSearchBoards />
+          <div ref={profileRef}>
+            <img
+              className="rounded-full"
+              src={photoURL}
+              width={32}
+              height={32}
+              onClick={showMenuHandler}
+            />
           </div>
-        )}
+          {showMenu && (
+            <div className="showMenu z-10 absolute right-0" ref={menuRef}>
+              <ul>
+                <li
+                  className="p-3 bg-slate-800 cursor-pointer hover:bg-slate-700 text-slate-100"
+                  onClick={signOutHandler}
+                >
+                  Sign Out
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

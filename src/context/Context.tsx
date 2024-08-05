@@ -34,6 +34,7 @@ export type List = {
   id: string;
   title: string;
   indexInList: number;
+  boardID: string;
 };
 
 export type Board = {
@@ -58,7 +59,7 @@ export type ItemComment = {
 };
 
 type Props = {
-  addItem: (title: string, listID: string, index: number) => void;
+  addItem: (title: string, listID: string, index: number) => Promise<boolean>;
   //addList: (title: string) => void;
   db: Item[];
   lists: List[];
@@ -113,6 +114,10 @@ type Props = {
   updateLastUsingDate: (boardID: string, date: Timestamp) => Promise<boolean>;
   makeBoardStarredToggle: (boardId: string) => Promise<boolean>;
   setBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  setDB: React.Dispatch<React.SetStateAction<Item[]>>;
+  updateListTitle: (listID: string, title: string) => Promise<boolean>;
+  setLists: React.Dispatch<React.SetStateAction<List[]>>;
+  deleteList: (listID: string, boardID: string) => Promise<boolean>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -130,6 +135,53 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
+
+  const deleteList = async (
+    listID: string,
+    boardID: string
+  ): Promise<boolean> => {
+    try {
+      const listRef = doc(database, "lists", listID);
+      await deleteDoc(listRef);
+
+      // Verilen boardID'ye göre kalan listeleri getir
+      const listsRef = collection(database, "lists");
+      const q = query(listsRef, where("boardID", "==", boardID));
+      const snapshot = await getDocs(q);
+      let remainingLists = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      // Kalan listeleri `indexInList` değerlerine göre sırala
+      // remainingLists.sort((a, b) => a.indexInList - b.indexInList);
+
+      // `indexInList` değerlerini güncelle
+      const updatePromises = remainingLists.map((list, index) => {
+        const updatedList = { ...list, indexInList: index };
+        const listDocRef = doc(database, "lists", list.id);
+        return setDoc(listDocRef, updatedList);
+      });
+
+      // Tüm güncellemeleri tamamlayın
+      await Promise.all(updatePromises);
+
+      return true;
+    } catch (error) {
+      console.error("Error deleting list or updating indexes: ", error);
+      return false;
+    }
+  };
+
+  const updateListTitle = async (listID: string, title: string) => {
+    try {
+      const listRef = doc(database, "lists", listID);
+      await setDoc(listRef, { title: title }, { merge: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const makeBoardStarredToggle = async (boardID: string): Promise<boolean> => {
     try {
@@ -367,23 +419,29 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     });
   };
 
-  const addItem = async (title: string, listID: string, index: number) => {
-    const itemRef = collection(database, "items");
+  const addItem = async (
+    title: string,
+    listID: string,
+    index: number
+  ): Promise<boolean> => {
+    try {
+      const itemRef = collection(database, "items");
 
-    const addedItem = await addDoc(itemRef, {
-      title: title,
-      listID: listID,
-      itemIndex: index,
-    });
+      const addedItem = await addDoc(itemRef, {
+        title: title,
+        listID: listID,
+        itemIndex: index,
+      });
 
-    const id = addedItem.id;
+      const id = addedItem.id;
 
-    await setDoc(doc(database, "items", id), { id: id }, { merge: true });
+      await setDoc(doc(database, "items", id), { id: id }, { merge: true });
 
-    await getItem();
-
-    // const id = (db.length + 1).toString();
-    // setDB([...db, { id, title, listID }]);
+      await getItem();
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const getBGImages = async (): Promise<BGType[]> => {
@@ -569,6 +627,10 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         updateLastUsingDate,
         makeBoardStarredToggle,
         setBoards,
+        setDB,
+        updateListTitle,
+        setLists,
+        deleteList,
       }}
     >
       {children}
