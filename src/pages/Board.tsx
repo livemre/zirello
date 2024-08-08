@@ -16,12 +16,16 @@ import ListOverlayZone from "../components/ListOverlayZone";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { Timestamp } from "firebase/firestore";
+import { FaStar } from "react-icons/fa";
+import { CiStar } from "react-icons/ci";
+import FavoriteToggle from "../components/FavoriteToggle";
 
 const Board = () => {
   const { id } = useParams();
   const [boardDetails, setBoardDetails] = useState<BoardType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [tempLists, setTempLists] = useState<ListType[]>([]);
+  const [boardDetailsLoading, setBoardDetailsLoading] = useState<boolean>(true);
 
   const context = useContext(MainContext);
   if (!context) {
@@ -38,6 +42,12 @@ const Board = () => {
       .catch((error) => console.error("Lists cannot be loaded", error));
   };
 
+  useEffect(() => {
+    if (boardDetails) {
+      setBoardDetailsLoading(false);
+    }
+  }, [boardDetails]);
+
   const {
     lists,
     setActiveList,
@@ -50,6 +60,9 @@ const Board = () => {
     moveList,
     activeList,
     updateLastUsingDate,
+    setBoards,
+    boards,
+    makeBoardStarredToggle,
   } = context;
 
   useEffect(() => {
@@ -72,11 +85,10 @@ const Board = () => {
   const _getBoardDetails = async () => {
     if (id) {
       const data = await getBoardDetails(id);
+      setBoardDetails(data);
       console.log(data);
     }
   };
-
-  useEffect(() => {}, [boardDetails]);
 
   useEffect(() => {
     if (id) {
@@ -160,7 +172,31 @@ const Board = () => {
     }
   };
 
-  if (loading) {
+  const handleFavChanged = () => {
+    console.log("Boards ici on fav changed");
+    // setBoardDetails((prevDetails) => {
+    //   // Ensure prevDetails is not null before attempting to update it
+    //   if (prevDetails) {
+    //     return {
+    //       ...prevDetails,
+    //       isFav: !prevDetails.isFav,
+    //     };
+    //   }
+    //   // If prevDetails is null, return it unchanged
+    //   return prevDetails;
+    // });
+  };
+
+  useEffect(() => {
+    if (boards && id) {
+      const updatedBoard = boards.find((board) => board.id === id);
+      if (updatedBoard) {
+        setBoardDetails(updatedBoard);
+      }
+    }
+  }, [boards, id]);
+
+  if (loading || boardDetailsLoading) {
     return (
       <div className="flex flex-col justify-center items-center h-full">
         <ClipLoader size={48} className="text-slate-100" color="white" />
@@ -169,52 +205,71 @@ const Board = () => {
   }
 
   return (
-    <div
-      draggable="false"
-      className="flex flex-row justify-start list-container h-full dark-overlay"
-      style={{
-        backgroundImage: `url(${boardDetails?.bgImage})`,
-        backgroundColor: "#dddddd",
-        backgroundSize: "cover",
-      }}
-    >
-      {id && (
-        <ListOverlayZone
-          onDragEnter={onDragEnter}
-          onDragOver={onDragOver}
-          index={0}
-          onDrop={(e) => onDrop(e, 0)}
-        />
+    <div className="flex flex-col h-full">
+      {boardDetails && (
+        <div className="h-14 bg-gray-300 flex items-center pl-10 border-b-2 border-slate-400">
+          <p className="font-bold text-lg">{boardDetails?.name}</p>
+          <div>
+            {boardDetails && (
+              <FavoriteToggle
+                type="board"
+                board={boardDetails}
+                onFavChanged={handleFavChanged}
+              />
+            )}
+          </div>
+        </div>
       )}
+      <div
+        draggable="false"
+        className="flex flex-row justify-start list-container h-full dark-overlay"
+        style={{
+          backgroundImage: `url(${boardDetails?.bgImage})`,
+          backgroundColor: "#dddddd",
+          backgroundSize: "cover",
+        }}
+      >
+        {id && (
+          <ListOverlayZone
+            onDragEnter={onDragEnter}
+            onDragOver={onDragOver}
+            index={0}
+            onDrop={(e) => onDrop(e, 0)}
+          />
+        )}
 
-      <div className="flex">
-        {tempLists
-          .sort((a, b) => a.indexInList - b.indexInList) // Listeleri indexInList değerine göre sırala
-          .map((item, index) => {
-            return (
-              <div className="flex list" key={item.id}>
-                <div draggable onDragStart={(e) => onDragStart(e, item, index)}>
-                  <List
-                    onDeleteList={onDeleteList}
-                    title={item.title}
-                    id={item.id}
-                    index={index}
-                    indexInList={item.indexInList}
-                    boardID={item.boardID}
-                  />
+        <div className="flex">
+          {tempLists
+            .sort((a, b) => a.indexInList - b.indexInList) // Listeleri indexInList değerine göre sırala
+            .map((item, index) => {
+              return (
+                <div className="flex list" key={item.id}>
+                  <div
+                    draggable
+                    onDragStart={(e) => onDragStart(e, item, index)}
+                  >
+                    <List
+                      onDeleteList={onDeleteList}
+                      title={item.title}
+                      id={item.id}
+                      index={index}
+                      indexInList={item.indexInList}
+                      boardID={item.boardID}
+                    />
+                  </div>
+                  {id && (
+                    <ListOverlayZone
+                      onDragEnter={onDragEnter}
+                      onDragOver={onDragOver}
+                      index={index + 1}
+                      onDrop={(e) => onDrop(e, index + 1)}
+                    />
+                  )}
                 </div>
-                {id && (
-                  <ListOverlayZone
-                    onDragEnter={onDragEnter}
-                    onDragOver={onDragOver}
-                    index={index + 1}
-                    onDrop={(e) => onDrop(e, index + 1)}
-                  />
-                )}
-              </div>
-            );
-          })}
-        {id && <CreateList boardID={id} />}
+              );
+            })}
+          {id && <CreateList boardID={id} />}
+        </div>
       </div>
     </div>
   );

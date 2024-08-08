@@ -254,16 +254,15 @@ html {
 
 .modal-delete-list {
   position: fixed;
-  top: 10%;
+  top: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 400px;
   height: auto;
-  background-color: rgba(
+  background-color: rgb(
     51,
     51,
-    51,
-    0.9
+    51
   ); /* İçeriğin arka plan rengini değiştirdim */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge ekledim */
   padding: 20px;

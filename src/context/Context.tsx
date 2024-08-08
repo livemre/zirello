@@ -118,6 +118,8 @@ type Props = {
   updateListTitle: (listID: string, title: string) => Promise<boolean>;
   setLists: React.Dispatch<React.SetStateAction<List[]>>;
   deleteList: (listID: string, boardID: string) => Promise<boolean>;
+  updateItemTitle: (itemID: string, title: string) => Promise<boolean>;
+  deleteItem: (itemID: string) => Promise<boolean>;
 };
 
 const MainContext = createContext<Props | null>(null);
@@ -135,6 +137,29 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const database = getFirestore(myFirebaseApp);
+
+  const deleteItem = async (itemID: string): Promise<boolean> => {
+    const itemRef = doc(database, "items", itemID);
+    try {
+      await deleteDoc(itemRef);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const updateItemTitle = async (
+    itemID: string,
+    title: string
+  ): Promise<boolean> => {
+    try {
+      const cardRef = doc(database, "items", itemID);
+      await setDoc(cardRef, { title: title }, { merge: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const deleteList = async (
     listID: string,
@@ -631,6 +656,8 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         updateListTitle,
         setLists,
         deleteList,
+        updateItemTitle,
+        deleteItem,
       }}
     >
       {children}

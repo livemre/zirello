@@ -146,6 +146,11 @@ const List: FC<Props> = ({
     }
   };
 
+  const onDeleteItem = () => {
+    console.log("On delete item");
+    onDeleteList();
+  };
+
   return (
     <div className="w-72 min-w-72 bg-gray-950 p-2  list m-3 flex flex-col items-start justify-center rounded-2xl">
       {editListTitle ? (
@@ -166,7 +171,7 @@ const List: FC<Props> = ({
           <div className="flex items-center justify-between w-full">
             <p
               onClick={() => setEditListTitle(true)}
-              className="text-gray-200 text-lg font-semibold cursor-pointer"
+              className="text-gray-200 text-lg font-semibold cursor-pointer w-full text-left"
             >
               {title}
             </p>
@@ -177,33 +182,37 @@ const List: FC<Props> = ({
             />
           </div>
           {showDeleteListModal && (
-            <div className="modal-delete-list flex flex-col">
-              <div className="flex items-center justify-between mb-2 w-full">
-                <p className=" text-slate-200">
-                  Deleting a list is forever. There is no undo.
-                </p>
-                <IoMdClose
-                  size={18}
-                  color="white"
-                  onClick={() => {
-                    setShowDeleteListModal(false);
-                  }}
-                />
-              </div>
+            <>
+              <div className="fixed inset-0 bg-black opacity-70 z-40"></div>
 
-              <button
-                className="bg-red-500 text-black px-2 py-1 rounded-md w-full"
-                onClick={handleDeleteList}
-              >
-                Delete List
-              </button>
-            </div>
+              <div className="modal-delete-list flex flex-col">
+                <div className="flex items-center justify-between mb-2 w-full">
+                  <p className=" text-slate-200">
+                    Deleting a list is forever. There is no undo.
+                  </p>
+                  <IoMdClose
+                    size={18}
+                    color="white"
+                    onClick={() => {
+                      setShowDeleteListModal(false);
+                    }}
+                  />
+                </div>
+
+                <button
+                  className="bg-red-500 text-black px-2 py-1 rounded-md w-full"
+                  onClick={handleDeleteList}
+                >
+                  Delete List
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
-      <p className="text-gray-200 text-2xl">{id}</p>
+      {/* <p className="text-gray-200 text-2xl">{id}</p>
       <p className="text-gray-200 text-2xl">{index}</p>
-      <p className="text-gray-200 text-2xl">{indexInList}</p>
+      <p className="text-gray-200 text-2xl">{indexInList}</p> */}
 
       <div className="h-full w-full">
         <OverlayZone
@@ -227,6 +236,7 @@ const List: FC<Props> = ({
                   onDragEnter={onDragEnter}
                   onDragOver={onDragOver}
                   onDrop={(e) => onDrop(e, index)}
+                  onDeleteItem={onDeleteItem}
                 />
                 <div className="h-full w-full">
                   <OverlayZone
@@ -257,7 +267,7 @@ const List: FC<Props> = ({
               className="bg-blue-400 p-2 rounded-lg mr-2 px-7"
               onClick={_addItem}
             >
-              Kart Ekle
+              Add Card
             </button>
             <button
               onClick={() => setShowInput(false)}
@@ -274,7 +284,7 @@ const List: FC<Props> = ({
           }}
           className="border text-white border-gray-100 hover:bg-gray-800 hover:text-gray-200 cursor-pointer py-2 rounded-lg w-full"
         >
-          + Kart Ekle
+          + Add Card
         </div>
       )}
     </div>

@@ -39,10 +39,6 @@ const Navbar = (props: Props) => {
   const photoURL = user && user.photoURL ? user.photoURL : "";
 
   useEffect(() => {
-    // Burada ekstra bir işlem yapmanıza gerek yok, boards değiştikçe bileşen otomatik olarak render edilecektir
-  }, [boards]);
-
-  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         recentMenuRef.current &&
@@ -60,6 +56,12 @@ const Navbar = (props: Props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      getBoards(user?.uid);
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

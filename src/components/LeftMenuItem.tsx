@@ -3,6 +3,7 @@ import { Board, MainContext } from "../context/Context";
 import { FaStar } from "react-icons/fa";
 import { CiStar } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
+import FavoriteToggle from "./FavoriteToggle";
 
 type Props = {
   item: Board;
@@ -57,6 +58,7 @@ const LeftMenuItem: FC<Props> = ({ item }) => {
       onClick={(e: React.MouseEvent) => handleNavigate(e)}
       className="flex items-center justify-between m-1 p-2 hover:bg-slate-700 cursor-pointer"
     >
+      <FavoriteToggle board={item} />
       <div className="flex items-center">
         <img src={item.bgImage} className="w-8 h-5 mr-2" />
         <p className="text-slate-400">{item.name}</p>
